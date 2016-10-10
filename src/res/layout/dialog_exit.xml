@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/loading_bg"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/exit_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="0dp"
+        android:gravity="right"
+        android:paddingBottom="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp" >
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:src="@drawable/logout" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/icon"
+            android:layout_toRightOf="@id/icon"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:text="退出登录"
+            android:textColor="#194e62"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/name"
+            android:layout_below="@id/name"
+            android:paddingLeft="10dp"
+            android:text="退出后不会删除任何历史数据，下次登录依然可以使用本帐号"
+            android:textColor="#60b1ce"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#7fb7c8" >
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/logout_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="0dp"
+        android:gravity="right"
+        android:paddingBottom="20dp"
+        android:paddingRight="20dp"
+        android:paddingTop="20dp" >
+
+        <ImageView
+            android:id="@+id/icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:src="@drawable/uitb_169" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/icon"
+            android:layout_toRightOf="@id/icon"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:text="注销登录"
+            android:textColor="#194e62"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/name"
+            android:layout_below="@id/name"
+            android:paddingLeft="10dp"
+            android:text="注销或更换其它帐号登录"
+            android:textColor="#60b1ce"
+            android:textSize="12sp" />
+    </RelativeLayout>
+
+</LinearLayout>

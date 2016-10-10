@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<selector xmlns:android="http://schemas.android.com/apk/res/android">  
+ <item android:drawable="@drawable/segment_radio_blue_left_focus" android:state_checked="true" android:state_focused="true" android:state_pressed="false"/>  
+    <item android:drawable="@drawable/segment_radio_white_left_focus" android:state_checked="false" android:state_focused="true" android:state_pressed="false"/>  
+    <item android:drawable="@drawable/segment_radio_blue_left_press" android:state_pressed="true"/>  
+    <item android:drawable="@drawable/segment_radio_white_left" android:state_checked="false"/>  
+    <item android:drawable="@drawable/segment_radio_blue_left"/>  
+  
+</selector>  
