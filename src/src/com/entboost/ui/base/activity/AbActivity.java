@@ -70,6 +70,9 @@ public abstract class AbActivity extends FragmentActivity {
 	/** 记录日志的开关. */
 	private boolean D = AbAppData.DEBUG;
 
+	/**记录最后一个**/
+	private Toast lastToast;
+	
 	/** 加载框的文字说明. */
 	private String mProgressMessage = "请稍候...";
 
@@ -281,24 +284,34 @@ public abstract class AbActivity extends FragmentActivity {
 	}	
 	
 	/**
-	 * 描述：Toast提示文本.
+	 * 描述：Toast提示文本(需要外部调用方保证主线程调用)
 	 * 
 	 * @param text
 	 *            文本
 	 */
-	public void showToast(String text) {
-		Toast.makeText(this, "" + text, Toast.LENGTH_SHORT).show();
+	public synchronized void showToast(String text) {
+		//清除之前的提示
+		if (this.lastToast!=null)
+			this.lastToast.cancel();
+		//新提示
+		this.lastToast = Toast.makeText(this, "" + text, Toast.LENGTH_SHORT);
+		this.lastToast.show();
 	}
 
 	/**
-	 * 描述：Toast提示文本.
+	 * 描述：Toast提示文本(需要外部调用方保证主线程调用)
 	 * 
 	 * @param resId
 	 *            文本的资源ID
 	 */
-	public void showToast(int resId) {
-		Toast.makeText(this, "" + this.getResources().getText(resId),
-				Toast.LENGTH_SHORT).show();
+	public synchronized void showToast(int resId) {
+		//清除之前的提示
+		if (this.lastToast!=null)
+			this.lastToast.cancel();
+		
+		//新提示
+		this.lastToast = Toast.makeText(this, "" + this.getResources().getText(resId), Toast.LENGTH_SHORT);
+		this.lastToast.show();
 	}
 
 	/**

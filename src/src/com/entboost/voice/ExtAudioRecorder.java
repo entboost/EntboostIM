@@ -13,7 +13,6 @@ import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.media.MediaRecorder.AudioSource;
-import android.util.Log;
 
 import com.entboost.Log4jLog;
 
@@ -26,17 +25,17 @@ public class ExtAudioRecorder {
 	private final static int[] sampleRates = { 44100, 22050, 11025, 8000 };
 	private static ExtAudioRecorder result = null;
 
-	public static ExtAudioRecorder getInstanse(Boolean recordingCompressed) {
+	public static ExtAudioRecorder getInstanse(Boolean recordingCompressed, VoiceCallback callback) {
 		if (recordingCompressed) {
 			result = new ExtAudioRecorder(false, AudioSource.MIC,
 					sampleRates[3], AudioFormat.CHANNEL_CONFIGURATION_MONO,
-					AudioFormat.ENCODING_PCM_16BIT);
+					AudioFormat.ENCODING_PCM_16BIT, callback);
 		} else {
 			int i = 3;
 			do {
 				result = new ExtAudioRecorder(true, AudioSource.MIC,
 						sampleRates[i], AudioFormat.CHANNEL_CONFIGURATION_MONO,
-						AudioFormat.ENCODING_PCM_16BIT);
+						AudioFormat.ENCODING_PCM_16BIT, callback);
 
 			} while ((--i >= 0)
 					&& !(result.getState() == ExtAudioRecorder.State.INITIALIZING));
@@ -82,6 +81,8 @@ public class ExtAudioRecorder {
 	// File writer (only in uncompressed mode)
 	private RandomAccessFile randomAccessWriter;
 
+	private VoiceCallback callBack;
+	
 	// Number of channels, sample rate, sample size(size in bits), buffer size,
 	// audio source, sample size(see AudioFormat)
 	private short nChannels;
@@ -113,7 +114,15 @@ public class ExtAudioRecorder {
 	public State getState() {
 		return state;
 	}
-
+	
+	public void setCallBack(VoiceCallback callBack) {
+		this.callBack = callBack;
+	}
+	
+	public VoiceCallback getCallBack() {
+		return callBack;
+	}
+	
 	/*
 	 * 
 	 * Method used for recording.
@@ -121,7 +130,8 @@ public class ExtAudioRecorder {
 	private AudioRecord.OnRecordPositionUpdateListener updateListener = new AudioRecord.OnRecordPositionUpdateListener() {
 		public void onPeriodicNotification(AudioRecord recorder) {
 			try {
-				int length = audioRecorder.read(buffer, 0, buffer.length); // Fill buffer
+				//int length = audioRecorder.read(buffer, 0, buffer.length); // Fill buffer
+				int length = recorder.read(buffer, 0, buffer.length); // Fill buffer
 				if (length>0) {
 					randomAccessWriter.write(buffer); // Write buffer to file
 					payloadSize += buffer.length;
@@ -167,7 +177,10 @@ public class ExtAudioRecorder {
 	 * 
 	 */
 	public ExtAudioRecorder(boolean uncompressed, int audioSource,
-			int sampleRate, int channelConfig, int audioFormat) {
+			int sampleRate, int channelConfig, int audioFormat, VoiceCallback callback) {
+		
+		this.callBack = callback;
+		
 		try {
 			rUncompressed = uncompressed;
 			if (rUncompressed) { // RECORDING_UNCOMPRESSED
@@ -203,11 +216,18 @@ public class ExtAudioRecorder {
 									+ Integer.toString(bufferSize));
 				}
 
-				audioRecorder = new AudioRecord(audioSource, sampleRate,
-						channelConfig, audioFormat, bufferSize);
-
-				if (audioRecorder.getState() != AudioRecord.STATE_INITIALIZED)
+				audioRecorder = new AudioRecord(audioSource, sampleRate, channelConfig, audioFormat, bufferSize);
+				//Log4jLog.d(LONG_TAG, "new audioRecorder:"+audioRecorder);
+				
+				if (audioRecorder.getState() != AudioRecord.STATE_INITIALIZED) {
+					if (this.callBack!=null)
+						callBack.noPermission();
+					else 
+						Log4jLog.e(LONG_TAG, "no callback");
+					
 					throw new Exception("AudioRecord initialization failed");
+				}
+				
 				audioRecorder.setRecordPositionUpdateListener(updateListener);
 				audioRecorder.setPositionNotificationPeriod(framePeriod);
 			} else { // RECORDING_COMPRESSED
@@ -380,7 +400,7 @@ public class ExtAudioRecorder {
 	 * unnecessary files, when necessary
 	 * 
 	 */
-	public void release() {
+	public synchronized void release() {
 		if (state == State.RECORDING) {
 			stop();
 		} else {
@@ -398,10 +418,12 @@ public class ExtAudioRecorder {
 		if (rUncompressed) {
 			if (audioRecorder != null) {
 				audioRecorder.release();
+				audioRecorder = null;
 			}
 		} else {
 			if (mediaRecorder != null) {
 				mediaRecorder.release();
+				mediaRecorder = null;
 			}
 		}
 	}
@@ -450,15 +472,32 @@ public class ExtAudioRecorder {
 		if (state == State.READY) {
 			if (rUncompressed) {
 				payloadSize = 0;
-				audioRecorder.startRecording();
-				audioRecorder.read(buffer, 0, buffer.length);
+				try {
+					
+					audioRecorder.startRecording();
+					
+					int readSize = 0;
+					readSize =audioRecorder.read(buffer, 0, buffer.length);
+					if (readSize < 0) {
+						Log4jLog.e(LONG_TAG, "maybe has no permission to record, type-1");
+						state = State.ERROR;
+						if (this.callBack!=null)
+							callBack.noPermission();
+						else 
+							Log4jLog.e(LONG_TAG, "no callback");
+					}
+				} catch (IllegalStateException e) {
+					Log4jLog.e(LONG_TAG, "maybe has no permission to record type-2", e);
+					state = State.ERROR;
+					if (this.callBack!=null)
+						callBack.noPermission();
+				}
 			} else {
 				mediaRecorder.start();
 			}
 			state = State.RECORDING;
 		} else {
-			Log4jLog.e(LONG_TAG,
-					"start() called on illegal state");
+			Log4jLog.e(LONG_TAG, "start() called on illegal state");
 			state = State.ERROR;
 		}
 	}
@@ -471,11 +510,17 @@ public class ExtAudioRecorder {
 	 * uncompressed recording.
 	 * 
 	 */
-	public void stop() {
+	public synchronized void stop() {
+		if (rUncompressed) {
+			if (audioRecorder!=null)
+				audioRecorder.stop();
+		} else {
+			if (mediaRecorder!=null)
+				mediaRecorder.stop();
+		}
+		
 		if (state == State.RECORDING) {
 			if (rUncompressed) {
-				audioRecorder.stop();
-
 				try {
 					randomAccessWriter.seek(4); // Write size to RIFF header
 					randomAccessWriter.writeInt(Integer
@@ -492,15 +537,14 @@ public class ExtAudioRecorder {
 							"I/O exception occured while closing output file");
 					state = State.ERROR;
 				}
-			} else {
-				mediaRecorder.stop();
 			}
-			state = State.STOPPED;
 		} else {
 			Log4jLog.e(LONG_TAG,
 					"stop() called on illegal state");
-			state = State.ERROR;
+			//state = State.ERROR;
 		}
+		
+		state = State.STOPPED;
 	}
 
 	/*
@@ -521,20 +565,26 @@ public class ExtAudioRecorder {
 	 * @param path
 	 *            : 文件路径
 	 */
-	public File recordChat(String savePath, String fileName) {
+	public void recordChat(String savePath, String fileName) {
+		//Log4jLog.d(LONG_TAG, "recordChat savePath:" + savePath + ", fileName:"+fileName);
+		
 		File dir = new File(savePath);
 		// 如果该目录没有存在，则新建目录
 		if (dir.list() == null) {
-			dir.mkdirs();
+			boolean b = dir.mkdirs();
+			Log4jLog.d(LONG_TAG, "recordChat make dir result=" + b);
 		}
 		// 获取录音文件
-		File file = new File(savePath + fileName);
+		//File file = new File(savePath + fileName);
 		// 设置输出文件
 		result.setOutputFile(savePath + fileName);
 		result.prepare();
 		// 开始录音
 		result.start();
-		return file;
+		
+		//Log4jLog.d(LONG_TAG, "recordChat start finish");
+		
+		//return file;
 	}
 
 	/**
@@ -620,7 +670,7 @@ public class ExtAudioRecorder {
 
 	public static void main(String[] args) {
 		// 获取类的实例
-		ExtAudioRecorder recorder = ExtAudioRecorder.getInstanse(false); // 未压缩的录音（WAV）
+		ExtAudioRecorder recorder = ExtAudioRecorder.getInstanse(false, null); // 未压缩的录音（WAV）
 		recorder.recordChat("/mnt/", "upload_media.wav");
 		// 录音时间
 		try {

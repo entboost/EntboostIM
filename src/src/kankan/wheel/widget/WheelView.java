@@ -22,6 +22,8 @@ package kankan.wheel.widget;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.entboost.im.R;
+
 import kankan.wheel.widget.adapters.WheelViewAdapter;
 import android.content.Context;
 import android.database.DataSetObserver;
@@ -35,8 +37,6 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Interpolator;
 import android.widget.LinearLayout;
-
-import com.entboost.im.R;
 
 /**
  * Numeric wheel view.

@@ -48,6 +48,7 @@ import com.entboost.ui.base.view.pupmenu.PopMenuItemOnClickListener;
 import com.entboost.ui.base.view.titlebar.AbTitleBar;
 import com.entboost.utils.NetworkUtils;
 import com.entboost.voice.ExtAudioRecorder;
+import com.entboost.voice.VoiceCallback;
 
 public class ChatActivity extends EbActivity {
 
@@ -253,47 +254,90 @@ public class ChatActivity extends EbActivity {
 		final ImageButton keyBtn = (ImageButton) this.findViewById(R.id.keyBtn);
 		voiceSendBtn.setOnTouchListener(new View.OnTouchListener() {
 
-			private ExtAudioRecorder recorder;
+			private boolean noPermission = false;
 			private long time = 0;
+			private ExtAudioRecorder recorder;
+			//录音情况回调
+			private VoiceCallback callback = new VoiceCallback () {
+				@Override
+				public void noPermission() {
+					noPermission = true;
+					showToast("不能正常录音，请检查是否有开通录音权限");
+				}
+			};
 			
-			public void up(){
-				Log4jLog.i(LONG_TAG, "voice to up");
+			//检测录音合理性和发送录音
+			public synchronized void checkAndUp(long targetTime) {
+				//结束录音
+				if (recorder != null)
+					recorder.stopRecord();
+				
+				if (targetTime==0 || targetTime!=time) {
+					Log4jLog.e(LONG_TAG, "checkAndUp miss, invalid duration: targetTime=" + targetTime + ", time="+time);
+					return;
+				}
+				
+				if (time==0) {
+					Log4jLog.e(LONG_TAG, "checkAndUp miss, invalid time:" + time);
+					return;
+				}
+				
+				time = 0;
 				
 				// 松开事件发生后执行代码的区域
 				voiceSendBtn.setText("按住说话");
 				voiceImg.setVisibility(View.GONE);
-				if (recorder != null) {
-					recorder.stopRecord();
-					if (uid < 0) {
-						pageInfo.showError(ChatActivity.this
-								.getString(R.string.msg_send_uiderror));
-					}
-					if (uid >= 0) { 
-						if (chattype == CHATTYPE_PERSON) {
-							EntboostCM.sendVoice(uid,
-									recorder.getFilePath());
-						} else {
-							EntboostCM.sendGroupVoice(uid,
-									recorder.getFilePath());
-						}
-
-					}
-					refreshPage();
+				
+				if (noPermission) {
+					Log4jLog.e(LONG_TAG, "no record permission");
+					return;
 				}
+				
+				// 语音少于1秒不发
+				String filePath = recorder.getFilePath();
+				//Log4jLog.i(LONG_TAG, "check voice filePath:" + filePath);
+				int duration = ExtAudioRecorder.getVideoPlayTime(filePath);
+				Log4jLog.i(LONG_TAG, "record duration:" + duration);
+				
+				if (duration<1) {
+					Log4jLog.e(LONG_TAG, "voice is too short");
+					showToast("发送的语音时长少于1秒！");
+					return;
+				}
+				
+				if (uid < 0)
+					pageInfo.showError(ChatActivity.this.getString(R.string.msg_send_uiderror));
+				
+				if (uid >= 0) {
+					Log4jLog.i(LONG_TAG, "voice to upload");
+					
+					if (chattype == CHATTYPE_PERSON)
+						EntboostCM.sendVoice(uid ,recorder.getFilePath());
+					else
+						EntboostCM.sendGroupVoice(uid, recorder.getFilePath());
+				}
+				
+				//刷新界面，待定：可能需要解决在主线程执行
+				refreshPage();
 			}
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				switch (event.getAction()) {
 				case MotionEvent.ACTION_DOWN: {
+					//结束之前的录音
+					if (recorder != null)
+						recorder.stopRecord();
+					
 					if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
 						pageInfo.showError(ChatActivity.this
 								.getString(R.string.msg_error_localNoNetwork));
 						return false;
 					}
-					synchronized(this) {
-						time = System.currentTimeMillis();
-					}
+					
+					final long now = System.currentTimeMillis();
+					time = now;
+					
 					new AsyncTask<Void, Void, Void>() {
 
 						@Override
@@ -309,49 +353,74 @@ public class ChatActivity extends EbActivity {
 
 						@Override
 						protected void onPostExecute(Void result) {
-							synchronized(this) {
-								if (time != 0) {
-									up();
-									time=0;
-								}
-							}
+							Log4jLog.d(LONG_TAG, "onPostExecute, time="+now);
+							checkAndUp(now);
+//							synchronized(this) {
+//								if (time != 0) {
+//									up();
+//									time=0;
+//								}
+//							}
 						}
 						
 					}.execute();
 					// 按住事件发生后执行代码的区域
 					voiceImg.setVisibility(View.VISIBLE);
-					recorder = EntboostCM.startRecording();
+					
+					Log4jLog.d(LONG_TAG, "going to start record, time="+System.currentTimeMillis());
+					recorder = EntboostCM.startRecording(callback);
+					
 					voiceSendBtn.setText("松开发送");
-					break;
 				}
+					break;
 				case MotionEvent.ACTION_MOVE: {
 					// 移动事件发生后执行代码的区域
-					break;
 				}
+					break;
+				case MotionEvent.ACTION_CANCEL: {
+					Log4jLog.d(LONG_TAG, "record cancel");
+					
+					//结束录音
+					if (recorder != null)
+						recorder.stopRecord();
+					
+					time = 0;
+					
+					// 松开事件发生后执行代码的区域
+					voiceSendBtn.setText("按住说话");
+					voiceImg.setVisibility(View.GONE);
+				}
+					break;
 				case MotionEvent.ACTION_UP: {
-					synchronized(this) {
-						// 语音少于1秒不发
-						long now = System.currentTimeMillis();
-						Log4jLog.i(LONG_TAG, "oldTime:"+now+", time:"+time);
-						if ((now - time - 1500 <= 0) || time==0) {
-							Log4jLog.i(LONG_TAG, "voice is too short");
-							showToast("发送的语音时长少于1秒！");
-							voiceSendBtn.setText("按住说话");
-							voiceImg.setVisibility(View.GONE);
-							time=0;
-							if (recorder != null) {
-								recorder.stopRecord();
-							}
-							break;
-						} else {
-//						if (time != 0) {
-							up();
-							time=0;
+					Log4jLog.d(LONG_TAG, "MotionEvent.ACTION_UP, time="+time);
+					checkAndUp(time);
+					
+//					synchronized(this) {
+//						// 语音少于1秒不发
+//						int duration = ExtAudioRecorder.getVideoPlayTime(recorder.getFilePath());
+//						Log4jLog.i(LONG_TAG, "record duration:" + duration);
+////						long now = System.currentTimeMillis();
+////						Log4jLog.i(LONG_TAG, "oldTime:"+now+", time:"+time);
+//						//if ((now - time - 1500 <= 0) || time==0) {
+//						if (duration<1) {
+//							Log4jLog.i(LONG_TAG, "voice is too short");
+//							showToast("发送的语音时长少于1秒！");
+//							voiceSendBtn.setText("按住说话");
+//							voiceImg.setVisibility(View.GONE);
+//							time=0;
+//							if (recorder != null) {
+//								recorder.stopRecord();
+//							}
+//							break;
+//						} else {
+////						if (time != 0) {
+//							up();
+//							time=0;
+////						}
 //						}
-						}
-					}
-					break;
+//					}
 				}
+					break;
 				default:
 					break;
 				}
@@ -476,8 +545,7 @@ public class ChatActivity extends EbActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				final Resource emotions = (Resource) emotionsImageAdapter
-						.getItem(position);
+				final Resource emotions = (Resource) emotionsImageAdapter.getItem(position);
 				UIUtils.addEmotions(mContentEdit, emotions);
 				emotionsAppPanel.setVisibility(View.GONE);
 			}
@@ -560,14 +628,15 @@ public class ChatActivity extends EbActivity {
 	}
 
 	private void getPicFromContent() {
-		Intent intent = new Intent();
+		Intent intent;
 		if (Build.VERSION.SDK_INT < 19) {
 			intent = new Intent(Intent.ACTION_GET_CONTENT);
 			intent.setType("image/*");
 		} else {
-			intent = new Intent(
-					Intent.ACTION_PICK,
-					android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			//intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+			intent = new Intent(Intent.ACTION_PICK);
+			intent.setType("image/*");
+			intent.setAction(Intent.ACTION_GET_CONTENT);
 		}
 		startActivityForResult(intent, 2);
 	}

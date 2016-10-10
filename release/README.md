@@ -1,21 +1,25 @@
 ﻿
-EntboostIM-v1.4.5.155
+EntboostIM-v1.4.5.167 2016-10-10
+----------
+- 完美解决某些手机，因为权限问题，导致录制语音0秒问题；
+
+EntboostIM-v1.4.5.155 2016-10-08
 ----------
 - 解决某些手机型号，发送拍照图片程序异常；以及发送语音消息，0秒错误问题；
 
-EntboostIM-v1.4.5.151
+EntboostIM-v1.4.5.151 2016-09-30
 ----------
 - 完美解决网络掉线、信号不好、服务端重启等各种异常情况，能正常自动重新登录，正常收发聊天消息；
 - 解决某些手机型号，异常退出问题，提高稳定性；
 
-EntboostIM-v1.4.3.133
+EntboostIM-v1.4.3.133 2016-04-27
 ----------
 支持的恩布私有云服务器版本v1.20   [下载](http://doc.entboost.com/index.php/Downloads)
 - 配合 1.20 恩布服务端版本更新
 - 美化登录界面和解决临时讨论组一个操作异常；
 - 性能优化和修正已知BUG；
 
-EntboostIM-v1.4.2.129
+EntboostIM-v1.4.2.129 2015-11-20
 ----------
 支持的恩布私有云服务器版本v1.18   [下载](http://doc.entboost.com/index.php/Downloads)
 - 增加部门和群组的修改
@@ -24,7 +28,7 @@ EntboostIM-v1.4.2.129
 - 增加支持邮箱帐号直接登录
 - 其他界面优化及修正已知BUG
 
-EntboostIM-v1.4.0.110
+EntboostIM-v1.4.0.110 2015-06-19
 ----------
 支持的恩布私有云服务器版本v1.15   [下载](http://doc.entboost.com/index.php/Downloads)
 - 增加接收文件列表浏览界面
@@ -33,7 +37,7 @@ EntboostIM-v1.4.0.110
 - 优化群组操作的同步刷新
 - 修正其他已知BUG
 
-EntboostIM-v1.3.0.100
+EntboostIM-v1.3.0.100 2015-04-17
 ----------
 支持的恩布私有云服务器版本v1.12   [下载](http://doc.entboost.com/index.php/Downloads)
 - 增加文件收发的功能

@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.entboost.im"
     android:versionCode="1"
-    android:versionName="1.4.5.155" >
+    android:versionName="1.4.5.167" >
 
     <uses-sdk android:minSdkVersion="11" /> <!-- android:targetSdkVersion="15" -->
 
