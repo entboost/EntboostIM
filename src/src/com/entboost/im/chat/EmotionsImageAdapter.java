@@ -22,12 +22,12 @@ public class EmotionsImageAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return EntboostCache.getEmotionslist().size();
+		return EntboostCache.getEmotionsSize();
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return EntboostCache.getEmotionslist().get(position);
+		return EntboostCache.getEmotionByPosition(position);
 	}
 
 	@Override

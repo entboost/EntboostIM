@@ -1,5 +1,7 @@
 package com.entboost.im.message;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import net.yunim.service.entity.BroadcastMessage;
@@ -15,17 +17,15 @@ import com.entboost.utils.AbDateUtil;
 
 public class BroadcastMessageAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
-	private Vector<BroadcastMessage> list = new Vector<BroadcastMessage>();
+	private List<BroadcastMessage> list = new ArrayList<BroadcastMessage>();
 
-	public BroadcastMessageAdapter(Context context,
-			Vector<BroadcastMessage> list) {
+	public BroadcastMessageAdapter(Context context, List<BroadcastMessage> list) {
 		// 用于将xml转为View
-		this.mInflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		setList(list);
 	}
 
-	public void setList(Vector<BroadcastMessage> list) {
+	public void setList(List<BroadcastMessage> list) {
 		this.list.clear();
 		this.list.addAll(list);
 	}

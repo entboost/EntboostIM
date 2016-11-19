@@ -1,5 +1,7 @@
 package com.entboost.im.chat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import net.yunim.service.EntboostCM;
@@ -7,7 +9,6 @@ import net.yunim.service.EntboostUM;
 import net.yunim.service.constants.EB_ACCOUNT_TYPE;
 import net.yunim.service.entity.CallInfo;
 import net.yunim.service.listener.EditContactListener;
-import net.yunim.utils.UIUtils;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -20,7 +21,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
+import com.entboost.im.global.UIUtils;
 import com.entboost.utils.AbDateUtil;
 
 public class CallAdapter extends BaseAdapter {
@@ -28,17 +31,16 @@ public class CallAdapter extends BaseAdapter {
 	private Context mContext;
 	// xml转View对象
 	private LayoutInflater mInflater;
-	private Vector<CallInfo> list = new Vector<CallInfo>();
+	private List<CallInfo> list = new ArrayList<CallInfo>();
 
-	public CallAdapter(Context context, Vector<CallInfo> list) {
+	public CallAdapter(Context context, List<CallInfo> list) {
 		this.mContext = context;
 		// 用于将xml转为View
-		this.mInflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		setList(list);
 	}
 
-	public void setList(Vector<CallInfo> list) {
+	public void setList(List<CallInfo> list) {
 		this.list.clear();
 		this.list.addAll(list);
 	}
@@ -148,23 +150,29 @@ public class CallAdapter extends BaseAdapter {
 					final CallInfo callInfo = (CallInfo) getItem(position);
 					callInfo.setType(CallInfo.TYPE_ACCEPT);
 					EntboostUM.addContact(callInfo, new EditContactListener() {
-
 						@Override
-						public void onFailure(String arg0) {
-							UIUtils.showToast(mContext, arg0);
+						public void onFailure(final String arg0) {
+							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+								@Override
+								public void run() {
+									UIUtils.showToast(mContext, arg0);
+								}
+							});
 						}
-
+						
 						@Override
 						public void onEditContactSuccess() {
-							holder.itemstype.setText("已接受");
-							Intent intent = new Intent(mContext,
-									ChatActivity.class);
-							intent.putExtra(ChatActivity.INTENT_TITLE, callInfo
-									.getCardInfo().getNa());
-							intent.putExtra(ChatActivity.INTENT_UID,
-									callInfo.getCallTo());
-							mContext.startActivity(intent);
-							((CallListActivity) mContext).finish();
+							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+								@Override
+								public void run() {
+									holder.itemstype.setText("已接受");
+									Intent intent = new Intent(mContext, ChatActivity.class);
+									intent.putExtra(ChatActivity.INTENT_TITLE, callInfo.getCardInfo().getNa());
+									intent.putExtra(ChatActivity.INTENT_UID, callInfo.getCallTo());
+									mContext.startActivity(intent);
+									((CallListActivity) mContext).finish();
+								}
+							});
 						}
 					});
 				}

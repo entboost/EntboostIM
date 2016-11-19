@@ -1,11 +1,9 @@
 package com.entboost.im.user;
 
 import net.yunim.service.EntboostCache;
-import net.yunim.service.EntboostLC;
 import net.yunim.service.EntboostUM;
 import net.yunim.service.entity.AppAccountInfo;
 import net.yunim.service.listener.RegisterListener;
-import net.yunim.utils.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,6 +12,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.lidroid.xutils.ViewUtils;
@@ -68,34 +67,38 @@ public class RegisterActivity extends EbActivity {
 			return;
 		}
 		showProgressDialog("正在注册中...");
-		EntboostUM.emailRegister(email,nameStr, pwdstr, entname,
-				new RegisterListener() {
-
+		EntboostUM.emailRegister(email,nameStr, pwdstr, entname, new RegisterListener() {
+			@Override
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onFailure(String errMsg) {
+					public void run() {
 						pageInfo.showError(errMsg);
 						removeProgressDialog();
 					}
+				});
+			}
 
+			@Override
+			public void onRegisterSuccess() {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onRegisterSuccess() {
+					public void run() {
 						removeProgressDialog();
 						String temp="";
 						if (EntboostCache.getAppInfo().getSend_reg_mail() == 1) {
 							temp="，请到注册邮箱激活帐号！";
 						}
-						showDialog("提示", "注册成功"+temp,
-								new DialogInterface.OnClickListener() {
-
-									@Override
-									public void onClick(
-											DialogInterface dialog,
-											int which) {
-										finish();
-									}
-								});
+						showDialog("提示", "注册成功"+temp, new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								finish();
+							}
+						});
 					}
 				});
+			}
+		});
 	}
 
 }

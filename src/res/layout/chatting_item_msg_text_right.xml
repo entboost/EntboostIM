@@ -86,7 +86,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:padding="5dp"
-                    android:src="@drawable/uitb_94"
+                    android:src="@drawable/uitb_56"
                     android:visibility="gone" />
 
                 <TextView
@@ -94,12 +94,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
+                    android:autoLink="all"
                     android:clickable="true"
                     android:padding="5dp"
-                    android:textColor="#18611f"
-                    android:textSize="16sp" 
-                    android:autoLink="all"
-                    android:textColorLink="@color/blue"/>
+                    android:textColor="@color/black"
+                    android:textColorLink="@color/text_link"
+                    android:textSize="16sp" />
+
             </LinearLayout>
 
             <ProgressBar
@@ -131,11 +132,11 @@
                     android:id="@+id/file_offline_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginRight="3dp"
                     android:background="@drawable/btn_style_w"
                     android:padding="5dp"
                     android:text="离线发送"
-                    android:layout_marginRight="3dp"
-                    android:textColor="#29728d"
+                    android:textColor="@color/black"
                     android:textSize="16sp" />
 
                 <Button
@@ -145,7 +146,7 @@
                     android:background="@drawable/btn_style_w"
                     android:padding="5dp"
                     android:text="取消"
-                    android:textColor="#29728d"
+                    android:textColor="@color/black"
                     android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>

@@ -27,7 +27,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:padding="8dp"
-                android:src="@drawable/entboost_logo" />
+                android:src="@drawable/default_user" />
 
             <TextView
                 android:id="@+id/user_username"
@@ -36,7 +36,7 @@
                 android:layout_alignTop="@id/user_head"
                 android:layout_marginTop="8dp"
                 android:layout_toRightOf="@id/user_head"
-                android:textColor="#194e62"
+                android:textColor="@color/text_color_2"
                 android:textSize="18sp" />
 
             <TextView
@@ -47,7 +47,7 @@
                 android:layout_below="@id/user_username"
                 android:layout_marginTop="5dp"
                 android:text="账号："
-                android:textColor="#60b1ce"
+                android:textColor="@color/text_color_gray"
                 android:textSize="12sp" />
 
             <TextView
@@ -57,7 +57,7 @@
                 android:layout_below="@id/user_username"
                 android:layout_marginTop="5dp"
                 android:layout_toRightOf="@id/user_account_lab"
-                android:textColor="#60b1ce"
+                android:textColor="@color/text_color_gray"
                 android:textSize="12sp" />
 
             <TextView
@@ -68,7 +68,7 @@
                 android:layout_below="@id/user_account_lab"
                 android:layout_marginTop="3dp"
                 android:text="编号："
-                android:textColor="#60b1ce"
+                android:textColor="@color/text_color_gray"
                 android:textSize="12sp" />
 
             <TextView
@@ -78,7 +78,7 @@
                 android:layout_alignBaseline="@+id/textView2"
                 android:layout_alignBottom="@+id/textView2"
                 android:layout_toRightOf="@+id/textView2"
-                android:textColor="#60b1ce"
+                android:textColor="@color/text_color_gray"
                 android:textSize="12sp" />
 
             <ImageView
@@ -110,7 +110,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="类型"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -120,7 +120,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -140,7 +140,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="签名"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -161,7 +161,7 @@
                     android:layout_toRightOf="@id/user_description_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
         </LinearLayout>
@@ -187,7 +187,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="主页"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -208,7 +208,7 @@
                     android:layout_toRightOf="@id/user_url_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -228,7 +228,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="性别"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <com.entboost.im.ui.SegmentedRadioGroup
@@ -280,7 +280,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="生日"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -301,7 +301,7 @@
                     android:layout_toRightOf="@id/user_birthday_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
         </LinearLayout>
@@ -328,7 +328,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="地区"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -349,7 +349,7 @@
                     android:layout_toRightOf="@id/user_area_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -369,7 +369,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="邮编"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -390,7 +390,7 @@
                     android:layout_toRightOf="@id/user_zipcode_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -410,7 +410,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="电话"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -431,7 +431,7 @@
                     android:layout_toRightOf="@id/user_tel_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -451,7 +451,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="手机"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -472,7 +472,7 @@
                     android:layout_toRightOf="@id/user_mobile_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -492,7 +492,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="邮件"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -513,7 +513,7 @@
                     android:layout_toRightOf="@id/user_email_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
             <RelativeLayout
@@ -532,7 +532,7 @@
                     android:layout_marginLeft="8dp"
                     android:padding="8dp"
                     android:text="地址"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <ImageView
@@ -553,7 +553,7 @@
                     android:layout_toRightOf="@id/user_addr_lab"
                     android:gravity="right"
                     android:padding="5dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
         </LinearLayout>

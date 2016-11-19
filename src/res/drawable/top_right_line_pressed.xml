@@ -3,12 +3,12 @@
 
     <item>
         <shape>
-            <solid android:color="#74bad1" />
+            <solid android:color="@color/border_line" />
         </shape>
     </item>
     <item android:top="1px" android:right="1px">
         <shape>
-            <solid android:color="#d4f4ff" />
+            <solid android:color="@color/bg_p" />
         </shape>
     </item>
 

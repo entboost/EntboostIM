@@ -18,9 +18,9 @@
             android:padding="10dp"
             android:hint="搜索:联系人、群组"
             android:singleLine="true"
-            android:textColorHint="#60b1ce"
+            android:textColorHint="@color/text_color_gray"
             android:textSize="16sp"
-            android:textColor="#60b1ce" >
+            android:textColor="@color/black" >
         </EditText>
 
         <ImageButton

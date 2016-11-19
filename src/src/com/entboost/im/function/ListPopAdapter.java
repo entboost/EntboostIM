@@ -1,5 +1,7 @@
 package com.entboost.im.function;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import net.yunim.service.entity.FnavInfo;
@@ -16,17 +18,17 @@ import com.entboost.im.R;
 public class ListPopAdapter extends BaseAdapter {
 
 	private Context context;
-
-	private Vector<FnavInfo> list=new Vector<FnavInfo>();
-
+	
+	private List<FnavInfo> list=new ArrayList<FnavInfo>();
+	
 	private int itemResource;
 	
-	public ListPopAdapter(Context context, Vector<FnavInfo> list,int itemResource) {
+	public ListPopAdapter(Context context, List<FnavInfo> list, int itemResource) {
 		this.context = context;
 		this.list.addAll(list);
 		this.itemResource = itemResource;
 	}
-
+	
 	@Override
 	public int getCount() {
 		return list.size();
@@ -34,7 +36,6 @@ public class ListPopAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int position) {
-
 		return list.get(position);
 	}
 
@@ -45,7 +46,6 @@ public class ListPopAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup viewGroup) {
-
 		ViewHolder holder;
 		if (convertView == null) {
 			convertView = LayoutInflater.from(context).inflate(itemResource, null);

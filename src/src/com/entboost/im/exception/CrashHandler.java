@@ -16,13 +16,9 @@ import java.util.Map;
 import net.yunim.eb.api.runnable.ThreadPool;
 import net.yunim.service.cache.FileCacheUtils;
 import net.yunim.service.cache.ServiceListener;
-import net.yunim.utils.UIUtils;
 import android.annotation.SuppressLint;
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -33,7 +29,7 @@ import android.widget.Toast;
 
 import com.entboost.Log4jLog;
 import com.entboost.im.MainActivity;
-import com.entboost.im.WelcomeActivity;
+import com.entboost.im.global.UIUtils;
 import com.entboost.ui.base.activity.MyActivityManager;
 
 @SuppressLint("SimpleDateFormat")
@@ -118,15 +114,15 @@ public class CrashHandler implements UncaughtExceptionHandler, ServiceListener {
 			MyActivityManager.getInstance().clearAllActivity();
 			
 			// 退出程序,注释下面的重启启动程序代码
-//			android.os.Process.killProcess(android.os.Process.myPid());
-//			System.exit(0);
+			android.os.Process.killProcess(android.os.Process.myPid());
+			System.exit(0);
 			
-			// 重新启动程序，注释上面的退出程序
-			 Intent intent = new Intent();
-			 intent.setClass(mContext, WelcomeActivity.class);
-			 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			 mContext.startActivity(intent);
-			 android.os.Process.killProcess(android.os.Process.myPid());
+			// 重新启动程序，注释上面的退出程序(调试状态不重启)
+//			 Intent intent = new Intent();
+//			 intent.setClass(mContext, WelcomeActivity.class);
+//			 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//			 mContext.startActivity(intent);
+//			 android.os.Process.killProcess(android.os.Process.myPid());
 		}
 	}
 

@@ -3,7 +3,6 @@ package com.entboost.im.user;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Vector;
 
@@ -44,11 +43,11 @@ import android.widget.TextView;
 
 import com.entboost.Log4jLog;
 import com.entboost.global.AbConstant;
-import com.entboost.im.MainActivity;
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
-import com.entboost.im.department.SelectHeadImgActivity;
 import com.entboost.im.global.MyApplication;
+import com.entboost.im.group.SelectHeadImgActivity;
 import com.entboost.im.ui.SegmentedRadioGroup;
 import com.entboost.utils.AbDateUtil;
 import com.lidroid.xutils.ViewUtils;
@@ -108,8 +107,8 @@ public class UserInfoActivity extends EbActivity {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_user_info);
 		ViewUtils.inject(this);
+		
 		segment_text.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
 			@Override
 			public void onCheckedChanged(RadioGroup arg0, int arg1) {
 				// 获取变更后的选中项的ID
@@ -127,25 +126,32 @@ public class UserInfoActivity extends EbActivity {
 				}
 				showProgressDialog("修改性别");
 				EntboostUM.editUserInfo(null, null, -1, null, -1, null, -1,
-						null, -1, null, null, null, gender, null, null, null,
-						-1, null, null, new EditInfoListener() {
+					null, -1, null, null, null, gender, null, null, null, -1, null, null, new EditInfoListener() {
+						@Override
+						public void onFailure(final String errMsg) {
+							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+								@Override
+								public void run() {
+									pageInfo.showError(errMsg);
+									removeProgressDialog();
+								}
+							});
+						}
 
-							@Override
-							public void onFailure(String errMsg) {
-								pageInfo.showError(errMsg);
-								removeProgressDialog();
-							}
-
-							@Override
-							public void onEditInfoSuccess() {
-								removeProgressDialog();
-							}
-						});
+						@Override
+						public void onEditInfoSuccess() {
+							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+								@Override
+								public void run() {
+									removeProgressDialog();
+								}
+							});
+						}
+					});
 			}
 		});
+		
 		user_birthday_layout.setOnClickListener(new View.OnClickListener() {
-
-			@SuppressLint("NewApi")
 			@Override
 			public void onClick(View v) {
 				DialogFragment newFragment = new MyDateDialogFragment();
@@ -164,18 +170,26 @@ public class UserInfoActivity extends EbActivity {
 		showProgressDialog("修改出生日期");
 		int birthday = mYear * 10000 + mMonth * 100 + mDay;
 		EntboostUM.editUserInfo(null, null, -1, null, -1, null, -1, null, -1,
-				null, null, null, -1, null, null, null, birthday, null, null,
-				new EditInfoListener() {
-
+				null, null, null, -1, null, null, null, birthday, null, null, new EditInfoListener() {
 					@Override
-					public void onFailure(String errMsg) {
-						pageInfo.showError(errMsg);
-						removeProgressDialog();
+					public void onFailure(final String errMsg) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								pageInfo.showError(errMsg);
+								removeProgressDialog();
+							}
+						});
 					}
 
 					@Override
 					public void onEditInfoSuccess() {
-						removeProgressDialog();
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								removeProgressDialog();
+							}
+						});
 					}
 				});
 	}
@@ -213,8 +227,7 @@ public class UserInfoActivity extends EbActivity {
 			if (img != null) {
 				userHead.setImageBitmap(img);
 			} else {
-				ImageLoader.getInstance().displayImage(user.getHeadUrl(),
-						userHead, MyApplication.getInstance().getImgOptions());
+				ImageLoader.getInstance().displayImage(user.getHeadUrl(), userHead, MyApplication.getInstance().getUserImgOptions());
 			}
 			user_account.setText(user.getAccount());
 			user_username.setText(user.getUsername());
@@ -262,9 +275,7 @@ public class UserInfoActivity extends EbActivity {
 	public void openInfoHeader(View view) {
 		if (user != null & user.getDefault_emp() != null) {
 			Intent intent = new Intent(this, SelectHeadImgActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-					| Intent.FLAG_ACTIVITY_SINGLE_TOP
-					| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.putExtra("memberCode", user.getDefault_emp());
 			this.startActivity(intent);
 		}
@@ -273,8 +284,7 @@ public class UserInfoActivity extends EbActivity {
 	@OnClick(R.id.user_name_layout)
 	public void openInfoNameEdit(View view) {
 		Intent intent = new Intent(this, InfoNameEditActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP
-				| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 	}
 
@@ -359,42 +369,62 @@ public class UserInfoActivity extends EbActivity {
 			public void onScrollingFinished(WheelView wheel) {
 				EntboostUM.loadDict(countries.get(wheel.getCurrentItem()).getDict_id(), new LoadDictListener() {
 					@Override
-					public void onFailure(String errMsg) {
-						showToast("地区数据加载失败！");
+					public void onFailure(final String errMsg) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								showToast("地区数据加载失败！");
+							}
+						});
 					}
 					
 					@Override
-					public void onLoadSuccess(List<Dict> pdicts) {
-						provinces = new Vector<Dict>(); 
-						if (pdicts!=null)
-							provinces.addAll(pdicts);
-						
-						updateProvince(province, provinces);
-						
-						if (provinces.size()>0 && province.getCurrentItem()>-1) {
-							EntboostUM.loadDict(provinces.get(province.getCurrentItem()).getDict_id(), new LoadDictListener() {
-								@Override
-								public void onFailure(String errMsg) {
-									showToast("地区数据加载失败！");
-								}
+					public void onLoadSuccess(final List<Dict> pdicts) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								provinces = new Vector<Dict>(); 
+								if (pdicts!=null)
+									provinces.addAll(pdicts);
 								
-								@Override
-								public void onLoadSuccess(List<Dict> cdicts) {
-									citys = new Vector<Dict>();
-									if (cdicts!=null)
-										citys.addAll(cdicts);
-									
-									DictAdapter adapter = new DictAdapter(citys,UserInfoActivity.this);
+								updateProvince(province, provinces);
+								
+								if (provinces.size()>0 && province.getCurrentItem()>-1) {
+									EntboostUM.loadDict(provinces.get(province.getCurrentItem()).getDict_id(), new LoadDictListener() {
+										@Override
+										public void onFailure(final String errMsg) {
+											HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+												@Override
+												public void run() {
+													showToast("地区数据加载失败！");
+												}
+											});
+										}
+										
+										@Override
+										public void onLoadSuccess(final List<Dict> cdicts) {
+											HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+												@Override
+												public void run() {
+													citys = new Vector<Dict>();
+													if (cdicts!=null)
+														citys.addAll(cdicts);
+													
+													DictAdapter adapter = new DictAdapter(citys,UserInfoActivity.this);
+													city.setViewAdapter(adapter);
+													city.setVisibleItems(10);
+												}
+											});
+										}
+									});
+								} else { //清空“city”选项
+									citys.clear();
+									DictAdapter adapter = new DictAdapter(citys, UserInfoActivity.this);
 									city.setViewAdapter(adapter);
 									city.setVisibleItems(10);
 								}
-							});
-						} else { //清空“city”选项
-							citys.clear();
-							DictAdapter adapter = new DictAdapter(citys, UserInfoActivity.this);
-							city.setViewAdapter(adapter);
-							city.setVisibleItems(10);
-						}
+							}
+						});
 					}
 				});
 			}
@@ -409,21 +439,30 @@ public class UserInfoActivity extends EbActivity {
 			@Override
 			public void onScrollingFinished(WheelView wheel) {
 				EntboostUM.loadDict(provinces.get(wheel.getCurrentItem()).getDict_id(), new LoadDictListener() {
-					
 					@Override
-					public void onFailure(String errMsg) {
-						showToast("地区数据加载失败！");
+					public void onFailure(final String errMsg) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								showToast("地区数据加载失败！");
+							}
+						});
 					}
 					
 					@Override
-					public void onLoadSuccess(List<Dict> cdicts) {
-						citys = new Vector<Dict>();
-						if (cdicts!=null)
-							citys.addAll(cdicts);
-						
-						DictAdapter adapter = new DictAdapter(citys,UserInfoActivity.this);
-						city.setViewAdapter(adapter);
-						city.setVisibleItems(10);
+					public void onLoadSuccess(final List<Dict> cdicts) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								citys = new Vector<Dict>();
+								if (cdicts!=null)
+									citys.addAll(cdicts);
+								
+								DictAdapter adapter = new DictAdapter(citys,UserInfoActivity.this);
+								city.setViewAdapter(adapter);
+								city.setVisibleItems(10);
+							}
+						});
 					}
 				});
 			}
@@ -434,77 +473,107 @@ public class UserInfoActivity extends EbActivity {
 		EntboostUM.loadDict(0, new LoadDictListener() {
 			@Override
 			public void onFailure(String errMsg) {
-				removeProgressDialog();
-				showToast("地区数据加载失败！");
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						removeProgressDialog();
+						showToast("地区数据加载失败！");
+					}
+				});
 			}
 
 			@Override
 			public void onLoadSuccess(final List<Dict> dicts) {
-				countries = new Vector<Dict>();
-				if (dicts!=null) {
-					List<Integer> keepedCountry = new ArrayList<Integer>();
-					Integer[] keepedIds = {156/*, 840, 276, 826, 250, 643*/}; // 156中国 158中国台湾 344香港 840美国 276德国 826英国 643俄罗斯 250法国 446澳门
-					Collections.addAll(keepedCountry, keepedIds);
-					for (Dict dict:dicts) {
-						if (keepedCountry.contains(dict.getDict_id())) {
-//							switch(dict.getDict_id()) {
-//							case 156:
-//								dict.setOIndex(1000);
-//								break;
-//							}
-							countries.add(dict);
-							//countries.addAll(dicts);
-						}
-					}
-					
-//			       Collections.sort(countries, new Comparator<Dict>() {
-//			            public int compare(Dict d1, Dict d2) {
-//			            	return d1.getOIndex()>d2.getOIndex()?-1:(d1.getOIndex()==d2.getOIndex()?0:1);
-//			            }
-//			        });
-				}
-				
-				//加载默认地区数据
-				final Dict dCountry = getDefaultCountry(countries);
-				EntboostUM.loadDict(dCountry.getDict_id(), new LoadDictListener() {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onFailure(String errMsg) {
-						removeProgressDialog();
-						showToast("地区数据加载失败！");
-					}
-
-					@Override
-					public void onLoadSuccess(List<Dict> pdicts) {
-						provinces = new Vector<Dict>();
-						if (pdicts!=null)
-							provinces.addAll(pdicts);
-						
-						if (provinces.size() == 0) {
-							initWheel(dialog_exitView, dCountry);
-						} else {
-							int provineId = 0;
-							if (user != null && user.getArea2() > 0) {
-								provineId = user.getArea2();
-							} else {
-								provineId = provinces.get(0).getDict_id();
+					public void run() {
+						countries = new Vector<Dict>();
+						if (dicts!=null) {
+							List<Integer> keepedCountry = new ArrayList<Integer>();
+							Integer[] keepedIds = {156/*, 840, 276, 826, 250, 643*/}; // 156中国 158中国台湾 344香港 840美国 276德国 826英国 643俄罗斯 250法国 446澳门
+							Collections.addAll(keepedCountry, keepedIds);
+							for (Dict dict:dicts) {
+								if (keepedCountry.contains(dict.getDict_id())) {
+//									switch(dict.getDict_id()) {
+//									case 156:
+//										dict.setOIndex(1000);
+//										break;
+//									}
+									countries.add(dict);
+									//countries.addAll(dicts);
+								}
 							}
-							EntboostUM.loadDict(provineId, new LoadDictListener() {
-								@Override
-								public void onFailure(String errMsg) {
-									removeProgressDialog();
-									showToast("地区数据加载失败！");
-								}
-
-								@Override
-								public void onLoadSuccess(List<Dict> cdicts) {
-									citys = new Vector<Dict>();
-									if (cdicts!=null)
-										citys.addAll(cdicts);
-									
-									initWheel(dialog_exitView, dCountry);
-								}
-							});
+							
+//					       Collections.sort(countries, new Comparator<Dict>() {
+//					            public int compare(Dict d1, Dict d2) {
+//					            	return d1.getOIndex()>d2.getOIndex()?-1:(d1.getOIndex()==d2.getOIndex()?0:1);
+//					            }
+//					        });
 						}
+						
+						//加载默认地区数据
+						final Dict dCountry = getDefaultCountry(countries);
+						EntboostUM.loadDict(dCountry.getDict_id(), new LoadDictListener() {
+							@Override
+							public void onFailure(String errMsg) {
+								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+									@Override
+									public void run() {
+										removeProgressDialog();
+										showToast("地区数据加载失败！");
+									}
+								});
+							}
+
+							@Override
+							public void onLoadSuccess(final List<Dict> pdicts) {
+								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+									@Override
+									public void run() {
+										provinces = new Vector<Dict>();
+										if (pdicts!=null)
+											provinces.addAll(pdicts);
+										
+										if (provinces.size() == 0) {
+											initWheel(dialog_exitView, dCountry);
+										} else {
+											int provineId = 0;
+											if (user != null && user.getArea2() > 0) {
+												provineId = user.getArea2();
+											} else {
+												provineId = provinces.get(0).getDict_id();
+											}
+											EntboostUM.loadDict(provineId, new LoadDictListener() {
+												@Override
+												public void onFailure(String errMsg) {
+													HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+														@Override
+														public void run() {
+															removeProgressDialog();
+															showToast("地区数据加载失败！");
+														}
+													});
+												}
+
+												@Override
+												public void onLoadSuccess(final List<Dict> cdicts) {
+													HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+														@Override
+														public void run() {
+															citys = new Vector<Dict>();
+															if (cdicts!=null)
+																citys.addAll(cdicts);
+															
+															initWheel(dialog_exitView, dCountry);
+														}
+													});
+												}
+											});
+										}
+									}
+								});
+							}
+						});						
 					}
 				});
 			}
@@ -551,18 +620,28 @@ public class UserInfoActivity extends EbActivity {
 						, (curCity!=null?curCity.getDict_id():0), (curCity!=null?curCity.getDict_name():null)
 						, -1, null, null, null, -1, null, null, null, -1, null, null, new EditInfoListener() {
 
+					@Override
+					public void onFailure(String errMsg) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
-							public void onFailure(String errMsg) {
-								removeProgressDialog();
-								getCenterDialog().cancel();
-							}
-							
-							@Override
-							public void onEditInfoSuccess() {
+							public void run() {
 								removeProgressDialog();
 								getCenterDialog().cancel();
 							}
 						});
+					}
+					
+					@Override
+					public void onEditInfoSuccess() {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								removeProgressDialog();
+								getCenterDialog().cancel();
+							}
+						});
+					}
+				});
 			}
 		});
 	}

@@ -6,7 +6,6 @@ import net.yunim.service.entity.AccountInfo;
 import net.yunim.service.entity.AppAccountInfo;
 import net.yunim.service.listener.FindPWDListener;
 import net.yunim.service.listener.LogonAccountListener;
-import net.yunim.utils.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,19 +19,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.PopupWindow.OnDismissListener;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.MainActivity;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.entboost.im.global.AppUtils;
+import com.entboost.im.global.IMStepExecutor;
 import com.entboost.im.global.MyApplication;
+import com.entboost.im.global.UIUtils;
 import com.entboost.im.setting.SetLogonServiceAddrActivity;
-import com.entboost.ui.base.view.pupmenu.PopMenu;
-import com.entboost.ui.base.view.pupmenu.PopMenuConfig;
-import com.entboost.ui.base.view.pupmenu.PopMenuItemOnClickListener;
+import com.entboost.ui.base.view.popmenu.PopMenu;
+import com.entboost.ui.base.view.popmenu.PopMenuConfig;
+import com.entboost.ui.base.view.popmenu.PopMenuItemOnClickListener;
 import com.entboost.ui.base.view.titlebar.AbTitleBar;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.ViewInject;
@@ -65,6 +67,14 @@ public class LoginActivity extends EbActivity {
 	private OnDismissListener dislistener;
 
 	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		
+		//退出应用程序
+		IMStepExecutor.getInstance().exitApplication();
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 		AppAccountInfo appInfo = EntboostCache.getAppInfo();
@@ -80,9 +90,7 @@ public class LoginActivity extends EbActivity {
 				vistor_loginBtn.setVisibility(View.VISIBLE);
 			}
 			if (appInfo.getEnt_logo_url() != null) {
-				ImageLoader.getInstance().displayImage(
-						appInfo.getEnt_logo_url(), entlogo,
-						MyApplication.getInstance().getImgOptions());
+				ImageLoader.getInstance().displayImage(appInfo.getEnt_logo_url(), entlogo, MyApplication.getInstance().getDefaultImgOptions());
 			} else {
 				entlogo.setImageResource(R.drawable.entboost_logo);
 			}
@@ -105,16 +113,14 @@ public class LoginActivity extends EbActivity {
 		if (StringUtils.isNotBlank(lastAccount)) {
 			loginName.setText(lastAccount);
 		}
+		
 		loginName.addTextChangedListener(new TextWatcher() {
-
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
 			@Override
@@ -126,6 +132,7 @@ public class LoginActivity extends EbActivity {
 				}
 			}
 		});
+		
 		login_username_clear.setOnClickListener(new View.OnClickListener() {
 
 			@Override
@@ -133,16 +140,15 @@ public class LoginActivity extends EbActivity {
 				loginName.setText("");
 			}
 		});
+		
 		loginPWD.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 			}
 
 			@Override
@@ -167,6 +173,7 @@ public class LoginActivity extends EbActivity {
 	public void selectAccount(View view) {
 		PopMenuConfig config = new PopMenuConfig();
 		config.setWidth(loginName.getWidth());
+		
 		if (popMenu == null) {
 			popMenu = new PopMenu(view.getContext(), config);
 			dislistener = new OnDismissListener() {
@@ -174,53 +181,40 @@ public class LoginActivity extends EbActivity {
 				@Override
 				public void onDismiss() {
 					isPopMenuShow = false;
-					login_username_downImg
-							.setBackgroundResource(R.drawable.uitb_08);
+					login_username_downImg.setBackgroundResource(R.drawable.uitb_08);
 				}
 			};
 			popMenu.setOnDismissListener(dislistener);
+			
 			String[] accountHistory = EntboostCache.getAccountHistorys();
 			for (final String account : accountHistory) {
-				popMenu.addItem(account,R.drawable.clear,R.layout.item_menu1,
-						new PopMenuItemOnClickListener() {
-
+				popMenu.addItem(account,R.drawable.clear,R.layout.item_menu1, new PopMenuItemOnClickListener() {
+					@Override
+					public void onItemClick() {
+						loginName.setText(account);
+					}
+				}, new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						showDialog("提示", "是否删除登录帐号" + account, new DialogInterface.OnClickListener() {
 							@Override
-							public void onItemClick() {
-								loginName.setText(account);
-							}
-
-						}, new View.OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								showDialog("提示", "是否删除登录帐号" + account,
-										new DialogInterface.OnClickListener() {
-
-											@Override
-											public void onClick(
-													DialogInterface dialog,
-													int which) {
-												if (StringUtils.equals(account,
-														loginName.getText()
-																.toString())) {
-													loginName.setText("");
-												}
-												popMenu.removeItem(account);
-												EntboostLC
-														.delAccountHistory(account);
-												if (EntboostCache
-														.getAccountHistorys() == null
-														|| EntboostCache
-																.getAccountHistorys().length == 0) {
-													login_username_downImg.setVisibility(View.INVISIBLE);
-												}
-											}
-										});
-
+							public void onClick(DialogInterface dialog, int which) {
+								if (StringUtils.equals(account, loginName.getText().toString())) {
+									loginName.setText("");
+								}
+								popMenu.removeItem(account);
+								EntboostLC.delAccountHistory(account);
+								if (EntboostCache.getAccountHistorys() == null|| EntboostCache.getAccountHistorys().length == 0) {
+									login_username_downImg.setVisibility(View.INVISIBLE);
+								}
 							}
 						});
+
+					}
+				});
 			}
 		}
+		
 		if (!isPopMenuShow) {
 			isPopMenuShow = true;
 			login_username_downImg.setBackgroundResource(R.drawable.uitb_081);
@@ -230,8 +224,7 @@ public class LoginActivity extends EbActivity {
 
 	@OnClick(R.id.login_setService)
 	public void setServiceAddr(View view) {
-		Intent intent = new Intent(LoginActivity.this,
-				SetLogonServiceAddrActivity.class);
+		Intent intent = new Intent(LoginActivity.this, SetLogonServiceAddrActivity.class);
 		startActivity(intent);
 	}
 
@@ -248,25 +241,34 @@ public class LoginActivity extends EbActivity {
 			showToast("密码不能为空！");
 			return;
 		}
+		
 		showProgressDialog("努力登录中...");
 		EntboostLC.logon(name, pwd, new LogonAccountListener() {
-
 			@Override
-			public void onFailure(String errMsg) {
-				pageInfo.showError(errMsg);
-				removeProgressDialog();
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						pageInfo.showError(errMsg);
+						removeProgressDialog();
+					}
+				});
 			}
-
+			
 			@Override
 			public void onLogonSuccess(AccountInfo pAccountInfo) {
-				removeProgressDialog();
-				Intent intent = new Intent(LoginActivity.this,
-						MainActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-						| Intent.FLAG_ACTIVITY_SINGLE_TOP
-						| Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						removeProgressDialog();
+						Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+								| Intent.FLAG_ACTIVITY_SINGLE_TOP
+								| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						finish();
+					}
+				});
 			}
 		});
 	}
@@ -283,15 +285,25 @@ public class LoginActivity extends EbActivity {
 		EntboostLC.findPwd(name, new FindPWDListener() {
 
 			@Override
-			public void onFailure(String errMsg) {
-				pageInfo.showError(errMsg);
-				removeProgressDialog();
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						pageInfo.showError(errMsg);
+						removeProgressDialog();
+					}
+				});
 			}
 
 			@Override
 			public void onFindPWDSuccess() {
-				removeProgressDialog();
-				UIUtils.showToast(LoginActivity.this, "成功找回密码，请到注册邮箱中查看！");
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						removeProgressDialog();
+						UIUtils.showToast(LoginActivity.this, "成功找回密码，请到注册邮箱中查看！");
+					}
+				});
 			}
 		});
 	}
@@ -299,32 +311,40 @@ public class LoginActivity extends EbActivity {
 	@OnClick(R.id.login_register)
 	public void register(View view) {
 		Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP
-				| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(intent);
 	}
-
+	
 	@OnClick(R.id.login_vistor_login_btn)
 	public void vistorLogin(View view) {
 		showProgressDialog("努力登录中...");
 		EntboostLC.logonVisitor(new LogonAccountListener() {
 
 			@Override
-			public void onFailure(String errMsg) {
-				pageInfo.showError(errMsg);
-				removeProgressDialog();
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						pageInfo.showError(errMsg);
+						removeProgressDialog();
+					}
+				});
 			}
 
 			@Override
 			public void onLogonSuccess(AccountInfo pAccountInfo) {
-				removeProgressDialog();
-				Intent intent = new Intent(LoginActivity.this,
-						MainActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-						| Intent.FLAG_ACTIVITY_SINGLE_TOP
-						| Intent.FLAG_ACTIVITY_CLEAR_TOP);
-				startActivity(intent);
-				finish();
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						removeProgressDialog();
+						Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+						intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+								| Intent.FLAG_ACTIVITY_SINGLE_TOP
+								| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(intent);
+						finish();
+					}
+				});
 			}
 		});
 	}

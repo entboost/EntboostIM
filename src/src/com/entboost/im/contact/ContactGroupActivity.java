@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.lidroid.xutils.ViewUtils;
@@ -42,42 +43,57 @@ public class ContactGroupActivity extends EbActivity {
 			return;
 		}
 		showProgressDialog("修改联系人分组");
-		EntboostUM.editContactGroup(group.getUgid(), contactgroup_group_str,
-				new EditGroupListener() {
-
+		EntboostUM.editContactGroup(group.getUgid(), contactgroup_group_str, new EditGroupListener() {
+			@Override
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onFailure(String errMsg) {
+					public void run() {
 						pageInfo.showError(errMsg);
 						removeProgressDialog();
 					}
-
+				});
+			}
+			
+			@Override
+			public void onEditGroupSuccess(Long dep_code) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onEditGroupSuccess(Long dep_code) {
+					public void run() {
 						removeProgressDialog();
 						finish();
 					}
 				});
+			}
+		});
 	}
 	
 	@OnClick(R.id.contactgroup_del_btn)
 	public void del(View view) {
 		showProgressDialog("正在删除分组！");
-		EntboostUM.delContactGroup(group.getUgid(),
-				new DelGroupListener() {
-
+		EntboostUM.delContactGroup(group.getUgid(), new DelGroupListener() {
+			@Override
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onFailure(String errMsg) {
+					public void run() {
 						removeProgressDialog();
 						showToast(errMsg);
 					}
+				});
+			}
 
+			@Override
+			public void onDelGroupSuccess() {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onDelGroupSuccess() {
+					public void run() {
 						removeProgressDialog();
 						finish();
 					}
-
 				});
+			}
+		});
 	}
 
 	@OnClick(R.id.contactgroup_cancel_btn)

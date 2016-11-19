@@ -3,9 +3,10 @@ package com.entboost.im.chat;
 import java.io.File;
 import java.util.Vector;
 
+import net.yunim.service.cache.FileCacheUtils;
+
 import org.apache.commons.lang3.StringUtils;
 
-import net.yunim.service.cache.FileCacheUtils;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,9 +21,9 @@ import android.widget.ListView;
 
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
-import com.entboost.ui.base.view.pupmenu.PopMenuConfig;
-import com.entboost.ui.base.view.pupmenu.PopMenuItem;
-import com.entboost.ui.base.view.pupmenu.PopMenuItemOnClickListener;
+import com.entboost.ui.base.view.popmenu.PopMenuConfig;
+import com.entboost.ui.base.view.popmenu.PopMenuItem;
+import com.entboost.ui.base.view.popmenu.PopMenuItemOnClickListener;
 
 public class FileListActivity extends EbActivity {
 
@@ -34,22 +35,22 @@ public class FileListActivity extends EbActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_file_list);
+		
 		listView = (ListView) findViewById(R.id.filelist);
 		fileAdapter = new FileAdapter(this);
 		fileAdapter.setInput(getFileList());
 		listView.setAdapter(fileAdapter);
+		
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
 			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 				String fileName = (String) fileAdapter.getItem(position);
 				openFile(new File(fileName));
 				return false;
 			}
 		});
+		
 		listView.setOnItemClickListener(new OnItemClickListener() {
-
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
@@ -66,7 +67,6 @@ public class FileListActivity extends EbActivity {
 						selected.remove(fileName);
 					}
 				}
-
 			}
 		});
 		initMenu();
@@ -87,34 +87,27 @@ public class FileListActivity extends EbActivity {
 		config.setBackground_resId(R.drawable.popmenu);
 		config.setTextColor(Color.WHITE);
 		config.setShowAsDropDownYoff(28);
-		this.getTitleBar().addRightImageButton(R.drawable.ic_action_save, null,
-				new PopMenuItem(new PopMenuItemOnClickListener() {
-
-					@Override
-					public void onItemClick() {
-						if (selected.size() > 0) {
-							showDialog("提示", "是否删除文件！",
-									new DialogInterface.OnClickListener() {
-
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											for (String fileName : selected) {
-												deleteFile(new File(fileName));
-											}
-											fileAdapter.setInput(getFileList());
-											fileAdapter.notifyDataSetChanged();
-										}
-
-									});
-
-						} else {
-							showToast("未选择要删除的文件！");
+		this.getTitleBar().addRightImageButton(R.drawable.ic_action_save, null, new PopMenuItem(new PopMenuItemOnClickListener() {
+			@Override
+			public void onItemClick() {
+				if (selected.size() > 0) {
+					showDialog("提示", "是否删除文件！", new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							for (String fileName : selected) {
+								deleteFile(new File(fileName));
+							}
+							fileAdapter.setInput(getFileList());
+							fileAdapter.notifyDataSetChanged();
 						}
-					}
 
-				}));
+					});
+				} else {
+					showToast("未选择要删除的文件！");
+				}
+			}
+
+		}));
 	}
 
 	public void deleteFile(File file) {

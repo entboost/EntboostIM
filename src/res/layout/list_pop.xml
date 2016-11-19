@@ -9,7 +9,7 @@
         android:id="@+id/pop_list"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:divider="#74bad1"
+        android:divider="@color/list_divider"
         android:dividerHeight="1px"
         android:drawSelectorOnTop="true"
         android:focusable="true"

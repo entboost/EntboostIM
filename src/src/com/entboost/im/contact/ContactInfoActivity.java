@@ -6,7 +6,6 @@ import net.yunim.service.entity.AppAccountInfo;
 import net.yunim.service.entity.ContactInfo;
 import net.yunim.service.listener.DelContactListener;
 import net.yunim.service.listener.EditContactListener;
-import net.yunim.utils.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,9 +17,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.entboost.im.chat.ChatActivity;
+import com.entboost.im.global.UIUtils;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 
@@ -39,44 +40,50 @@ public class ContactInfoActivity extends EbActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_contact_info);
+		
 		ViewUtils.inject(this);
 		con_id = getIntent().getLongExtra("con_id", -1);
-		findViewById(R.id.contact_username).setOnClickListener(
-				new OnClickListener() {
-
-					@Override
-					public void onClick(View v) {
-						Intent intent = new Intent(ContactInfoActivity.this,
-								ContactNameEditActivity.class);
-						intent.putExtra("contact", contactInfo.getContact());
-						startActivity(intent);
-					}
-				});
+		
+		findViewById(R.id.contact_username).setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(ContactInfoActivity.this, ContactNameEditActivity.class);
+				intent.putExtra("contact", contactInfo.getContact());
+				startActivity(intent);
+			}
+		});
 	}
 
 	@OnClick(R.id.contact_proving_btn)
 	public void addFriend(View view) {
 		if (contactInfo != null) {
 			showProgressDialog("正在验证好友");
-			EntboostUM.addContact(contactInfo.getContact(),
-					contactInfo.getName(), contactInfo.getDescription(),
-					contactInfo.getUgid(), new EditContactListener() {
-
+			EntboostUM.addContact(contactInfo.getContact(), contactInfo.getName(), contactInfo.getDescription(), contactInfo.getUgid(), new EditContactListener() {
+				@Override
+				public void onFailure(final String errMsg) {
+					HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 						@Override
-						public void onFailure(String errMsg) {
+						public void run() {
 							showToast(errMsg);
 							removeProgressDialog();
 						}
-
+					});
+				}
+				
+				@Override
+				public void onEditContactSuccess() {
+					HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 						@Override
-						public void onEditContactSuccess() {
+						public void run() {
 							removeProgressDialog();
 							finish();
 						}
 					});
+				}
+			});
 		}
 	}
-
+	
 	private void init() {
 		TextView username = (TextView) findViewById(R.id.contact_username);
 		TextView account = (TextView) findViewById(R.id.contact_account);
@@ -129,11 +136,8 @@ public class ContactInfoActivity extends EbActivity {
 	@OnClick(R.id.contact_group_layout)
 	public void contact_groupmanager(View view) {
 		if (contactInfo != null) {
-			Intent intent = new Intent(ContactInfoActivity.this,
-					SelectContactGroupActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-					| Intent.FLAG_ACTIVITY_SINGLE_TOP
-					| Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			Intent intent = new Intent(ContactInfoActivity.this, SelectContactGroupActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			intent.putExtra("con_id", contactInfo.getCon_id());
 			startActivity(intent);
 		}
@@ -168,21 +172,28 @@ public class ContactInfoActivity extends EbActivity {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				showProgressDialog("删除联系人");
-				EntboostUM.delContact(contactInfo.getCon_id(),
-						new DelContactListener() {
-
+				EntboostUM.delContact(contactInfo.getCon_id(), new DelContactListener() {
+					@Override
+					public void onFailure(final String errMsg) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
-							public void onFailure(String errMsg) {
+							public void run() {
 								pageInfo.showError(errMsg);
 								removeProgressDialog();
 							}
-
+						});
+					}
+					@Override
+					public void onDelContactSuccess() {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
-							public void onDelContactSuccess() {
+							public void run() {
 								removeProgressDialog();
 								finish();
 							}
 						});
+					}
+				});
 			}
 
 		});

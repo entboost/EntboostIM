@@ -1,16 +1,20 @@
 package com.entboost.im.chat;
 
 import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.yunim.service.EntboostCM;
 import net.yunim.service.EntboostCache;
+import net.yunim.service.api.UserCenter;
+import net.yunim.service.cache.EbCache;
 import net.yunim.service.cache.FileCacheUtils;
 import net.yunim.service.entity.AppAccountInfo;
 import net.yunim.service.entity.ChatRoomRichMsg;
 import net.yunim.service.entity.FileCache;
 import net.yunim.service.entity.Resource;
 import net.yunim.service.listener.CallUserListener;
-import net.yunim.utils.UIUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,13 +42,19 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.entboost.Log4jLog;
+import com.entboost.handler.HandlerToolKit;
+import com.entboost.im.MainActivity;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.entboost.im.contact.DefaultUserInfoActivity;
 import com.entboost.im.global.OtherUtils;
-import com.entboost.ui.base.view.pupmenu.PopMenu;
-import com.entboost.ui.base.view.pupmenu.PopMenuItem;
-import com.entboost.ui.base.view.pupmenu.PopMenuItemOnClickListener;
+import com.entboost.im.global.UIUtils;
+import com.entboost.im.group.MemberListActivity;
+import com.entboost.im.group.MemberSelectActivity;
+import com.entboost.ui.base.activity.MyActivityManager;
+import com.entboost.ui.base.view.popmenu.PopMenu;
+import com.entboost.ui.base.view.popmenu.PopMenuItem;
+import com.entboost.ui.base.view.popmenu.PopMenuItemOnClickListener;
 import com.entboost.ui.base.view.titlebar.AbTitleBar;
 import com.entboost.utils.NetworkUtils;
 import com.entboost.voice.ExtAudioRecorder;
@@ -53,18 +63,18 @@ import com.entboost.voice.VoiceCallback;
 public class ChatActivity extends EbActivity {
 
 	/** The tag. */
-	private static String TAG = ChatActivity.class.getSimpleName();
 	private static String LONG_TAG = ChatActivity.class.getName();
 	
 	public static final String INTENT_TITLE = "intent_title";
 	public static final String INTENT_UID = "intent_uid";
 	public static final String INTENT_CHATTYPE = "intent_chattype";
+	public static final String INTENT_TO_MSG_ID = "intent_to_msgid";
 
 	public static final int CHATTYPE_PERSON = 0;
 	public static final int CHATTYPE_GROUP = 1;
 
 	private int chattype = CHATTYPE_PERSON;
-	private Long uid;
+	private Long uid; //用户编号或群组编号(依赖chattype配合判断)
 	private EditText mContentEdit;
 	private ChatMsgViewAdapter mChatMsgViewAdapter;
 	private ListView mMsgListView;
@@ -103,21 +113,17 @@ public class ChatActivity extends EbActivity {
 		// 启动会话界面，接收消息自动设置已读
 		if (msg.getChatType() == ChatRoomRichMsg.CHATTYPE_GROUP) {
 			if (msg.getDepCode() - uid == 0) {
-				EntboostCache.readMsg(msg.getDepCode());
+				//EntboostCache.readMsg(msg.getDepCode());
+				EntboostCache.markReadDynamicNewsBySender(msg.getDepCode());
 			} else {
-				pageInfo.showInfo(msg.getSendName() + "[" + msg.getDepName()
-						+ "]:" + UIUtils.getTipCharSequence(msg.getTipHtml()),
-						5);
+				pageInfo.showInfo(msg.getSendName() + "[" + msg.getDepName()+ "]:" + UIUtils.getTipCharSequence(msg.getTipHtml()), 5);
 			}
 		} else {
-			if (msg.getSender() - uid == 0
-					|| msg.getSender() - EntboostCache.getUid() == 0) {
-				EntboostCache.readMsg(msg.getSender());
+			if (msg.getSender() - uid == 0 || msg.getSender() - EntboostCache.getUid() == 0) {
+				//EntboostCache.readMsg(msg.getSender());
+				EntboostCache.markReadDynamicNewsBySender(msg.getSender());
 			} else {
-				pageInfo.showInfo(
-						msg.getSendName() + ":"
-								+ UIUtils.getTipCharSequence(msg.getTipHtml()),
-						5);
+				pageInfo.showInfo(msg.getSendName() + ":" + UIUtils.getTipCharSequence(msg.getTipHtml()), 5);
 			}
 		}
 		refreshPage();
@@ -140,120 +146,163 @@ public class ChatActivity extends EbActivity {
 	 */
 	@Override
 	public void onSendStatusChanged(ChatRoomRichMsg msg) {
-		refreshPage();
+		//在主线程异步执行刷新视图
+		HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+			@Override
+			public void run() {
+				refreshPage();
+			}
+		});
+	}
+
+	//处理服务异常和未登陆状态
+	private void handleNotWork() {
+		//退出当前页
+		finish();
+		
+		if (!MyActivityManager.getInstance().isActivityExist(MainActivity.class.getName())) {
+			Log4jLog.e(LONG_TAG, "MainActivity instance is not exist, switch to it");
+			
+			Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			getApplicationContext().startActivity(intent);
+		}
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		boolean isWork = OtherUtils.checkServiceWork(0, false, "ChatActivity");
+		//service未启动，退出当前聊天页面
+		if (!isWork) {
+			Log4jLog.e(LONG_TAG, "the servie is not running, exit ChatActivity");
+			handleNotWork();
+		} else if (EbCache.getInstance().getSysDataCache().getAppInfo()==null){
+			Log4jLog.e(LONG_TAG, "AppAccountInfo为空, 当前状态未登录，exit ChatActivity");
+			handleNotWork();
+		}
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setAbContentView(R.layout.activity_chat);
+		
 		AbTitleBar titleBar = this.getTitleBar();
 		title = this.getIntent().getStringExtra(INTENT_TITLE);
 		titleBar.setTitleText(title);
 		uid = this.getIntent().getLongExtra(INTENT_UID, -1);
 		if (uid > 0) {
-			EntboostCache.readMsg(uid);// 设置消息已读
+			// 设置消息已读
+			EntboostCache.markReadDynamicNewsBySender(uid);
+			//EntboostCache.readMsg(uid);
 		}
-		chattype = this.getIntent().getIntExtra(INTENT_CHATTYPE,
-				CHATTYPE_PERSON);
+		
+		chattype = this.getIntent().getIntExtra(INTENT_CHATTYPE, CHATTYPE_PERSON);
 		if (chattype == CHATTYPE_PERSON) {
 			EntboostCache.loadPersonChatMsg(uid);// 加载已有缓存会话信息
 		} else {
 			EntboostCache.loadGroupChatMsg(uid);
 		}
-		if (chattype == CHATTYPE_PERSON) {
+		
+		if (chattype == CHATTYPE_PERSON) { //单聊
 			// 增加右上角会话对方的名片信息按钮
-			this.getTitleBar().addRightImageButton(R.drawable.uitb_20, null,
-					new PopMenuItem(new PopMenuItemOnClickListener() {
-
+			this.getTitleBar().addRightImageButton(R.drawable.uitb_20, null, new PopMenuItem(new PopMenuItemOnClickListener() {
+				@Override
+				public void onItemClick() {
+					Intent intent = new Intent(ChatActivity.this, DefaultUserInfoActivity.class);
+					intent.putExtra("uid", uid);
+					startActivity(intent);
+				}
+			}));
+			
+			// 增加右上角转换临时讨论组按钮
+			this.getTitleBar().addRightImageButton(R.drawable.ic_action_add_group, null, new PopMenuItem(new PopMenuItemOnClickListener() {
+				@Override
+				public void onItemClick() {
+					showDialog("提示", "是否需要转为临时讨论组", new DialogInterface.OnClickListener() {
 						@Override
-						public void onItemClick() {
-							Intent intent = new Intent(ChatActivity.this,
-									DefaultUserInfoActivity.class);
-							intent.putExtra("uid", uid);
-							startActivity(intent);
-						}
-
-					}));
-			this.getTitleBar().addRightImageButton(
-					R.drawable.ic_action_add_group, null,
-					new PopMenuItem(new PopMenuItemOnClickListener() {
-
-						@Override
-						public void onItemClick() {
-							showDialog("提示", "是否需要转为临时讨论组",
-									new DialogInterface.OnClickListener() {
-
+						public void onClick(DialogInterface dialog, int which) {
+							EntboostCM.call2Group(uid, new CallUserListener() {
+								@Override
+								public void onFailure(final String errMsg) {
+									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											EntboostCM.call2Group(uid,
-													new CallUserListener() {
-
-														@Override
-														public void onFailure(
-																String errMsg) {
-															removeProgressDialog();
-															pageInfo.showError(errMsg);
-														}
-
-														@Override
-														public void onCalling() {
-															showProgressDialog("正在转为临时讨论组");
-														}
-
-														@Override
-														public void onCallAlerting(
-																Long uid,
-																Long callid) {
-															removeProgressDialog();
-															showToast("转为临时讨论组成功！");
-														}
-													});
+										public void run() {
+											removeProgressDialog();
+											pageInfo.showError(errMsg);
 										}
 									});
+								}
+								
+								@Override
+								public void onCalling() {
+									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+										@Override
+										public void run() {
+											showProgressDialog("正在转为临时讨论组");
+										}
+									});
+								}
+								
+								@Override
+								public void onCallAlerting(Long uid, Long callid) {
+									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+										@Override
+										public void run() {
+											removeProgressDialog();
+											showToast("转为临时讨论组成功！");
+										}
+									});
+								}
+							});
 						}
+					});
+				}
 
-					}));
+			}));
+		} else { //群聊
+			// 增加右上角查看群组成员列表按钮
+			this.getTitleBar().addRightImageButton(R.drawable.uitb_19, null, new PopMenuItem(new PopMenuItemOnClickListener() {
+				@Override
+				public void onItemClick() {
+					Intent intent = new Intent(ChatActivity.this, MemberListActivity.class);
+					intent.putExtra("depid", uid);
+					startActivity(intent);
+				}
+			}));
 		}
+		
 		// 增加右上角漫游消息的按钮
 		// 1、判断是否有漫游消息的功能
 		final AppAccountInfo appInfo = EntboostCache.getAppInfo();
-		if (AppAccountInfo.SAVE_CONVERSATIONS_ONLINE == appInfo
-				.getSave_conversations()
-				|| AppAccountInfo.SAVE_CONVERSATIONS_ALL == appInfo
-						.getSave_conversations()) {
-			this.getTitleBar().addRightImageButton(
-					R.drawable.menu_add_tempgroup, null,
-					new PopMenuItem(new PopMenuItemOnClickListener() {
-
-						@Override
-						public void onItemClick() {
-							Intent intent = new Intent(ChatActivity.this,
-									OnlieChatMsgActivity.class);
-							if (chattype == CHATTYPE_PERSON) {
-								intent.putExtra("onlineChatUrl", appInfo
-										.getPersonConversationsAllUrl(uid));
-							} else {
-								intent.putExtra("onlineChatUrl", appInfo
-										.getGroupConversationsAllUrl(uid));
-							}
-							startActivity(intent);
-						}
-
-					}));
+		if (AppAccountInfo.SAVE_CONVERSATIONS_ONLINE == appInfo.getSave_conversations() || AppAccountInfo.SAVE_CONVERSATIONS_ALL == appInfo.getSave_conversations()) {
+			this.getTitleBar().addRightImageButton(R.drawable.menu_add_tempgroup, null, new PopMenuItem(new PopMenuItemOnClickListener() {
+				@Override
+				public void onItemClick() {
+					Intent intent = new Intent(ChatActivity.this, OnlieChatMsgActivity.class);
+					if (chattype == CHATTYPE_PERSON) {
+						intent.putExtra("onlineChatUrl", appInfo.getPersonConversationsAllUrl(uid));
+					} else {
+						intent.putExtra("onlineChatUrl", appInfo.getGroupConversationsAllUrl(uid));
+					}
+					startActivity(intent);
+				}
+			}));
 		}
+		
+		//聊天内容输入区
 		mContentEdit = (EditText) findViewById(R.id.content);
 		sendBtn = (Button) findViewById(R.id.sendBtn);
 		voiceImg = (ImageView) this.findViewById(R.id.imageViewvoice);
-		final Button voiceSendBtn = (Button) this
-				.findViewById(R.id.voicesendBtn);
-		final ImageButton voiceBtn = (ImageButton) this
-				.findViewById(R.id.voiceBtn);
+		final Button voiceSendBtn = (Button) this.findViewById(R.id.voicesendBtn);
+		final ImageButton voiceBtn = (ImageButton) this.findViewById(R.id.voiceBtn);
 		final ImageButton keyBtn = (ImageButton) this.findViewById(R.id.keyBtn);
+		
+		//语音消息聊天
 		voiceSendBtn.setOnTouchListener(new View.OnTouchListener() {
-
 			private boolean noPermission = false;
 			private long time = 0;
 			private ExtAudioRecorder recorder;
@@ -330,8 +379,7 @@ public class ChatActivity extends EbActivity {
 						recorder.stopRecord();
 					
 					if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
-						pageInfo.showError(ChatActivity.this
-								.getString(R.string.msg_error_localNoNetwork));
+						pageInfo.showError(ChatActivity.this.getString(R.string.msg_error_localNoNetwork));
 						return false;
 					}
 					
@@ -339,7 +387,6 @@ public class ChatActivity extends EbActivity {
 					time = now;
 					
 					new AsyncTask<Void, Void, Void>() {
-
 						@Override
 						protected Void doInBackground(Void... arg0) {
 							try {
@@ -355,14 +402,7 @@ public class ChatActivity extends EbActivity {
 						protected void onPostExecute(Void result) {
 							Log4jLog.d(LONG_TAG, "onPostExecute, time="+now);
 							checkAndUp(now);
-//							synchronized(this) {
-//								if (time != 0) {
-//									up();
-//									time=0;
-//								}
-//							}
 						}
-						
 					}.execute();
 					// 按住事件发生后执行代码的区域
 					voiceImg.setVisibility(View.VISIBLE);
@@ -394,31 +434,6 @@ public class ChatActivity extends EbActivity {
 				case MotionEvent.ACTION_UP: {
 					Log4jLog.d(LONG_TAG, "MotionEvent.ACTION_UP, time="+time);
 					checkAndUp(time);
-					
-//					synchronized(this) {
-//						// 语音少于1秒不发
-//						int duration = ExtAudioRecorder.getVideoPlayTime(recorder.getFilePath());
-//						Log4jLog.i(LONG_TAG, "record duration:" + duration);
-////						long now = System.currentTimeMillis();
-////						Log4jLog.i(LONG_TAG, "oldTime:"+now+", time:"+time);
-//						//if ((now - time - 1500 <= 0) || time==0) {
-//						if (duration<1) {
-//							Log4jLog.i(LONG_TAG, "voice is too short");
-//							showToast("发送的语音时长少于1秒！");
-//							voiceSendBtn.setText("按住说话");
-//							voiceImg.setVisibility(View.GONE);
-//							time=0;
-//							if (recorder != null) {
-//								recorder.stopRecord();
-//							}
-//							break;
-//						} else {
-////						if (time != 0) {
-//							up();
-//							time=0;
-////						}
-//						}
-//					}
 				}
 					break;
 				default:
@@ -427,8 +442,9 @@ public class ChatActivity extends EbActivity {
 				return false;
 			}
 		});
+		
+		//"切换语音消息"按钮
 		voiceBtn.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				View btnLayout = findViewById(R.id.voiceBtnLayout);
@@ -439,8 +455,9 @@ public class ChatActivity extends EbActivity {
 				keyBtn.setVisibility(View.VISIBLE);
 			}
 		});
+		
+		//"切换键盘输入"按钮
 		keyBtn.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				View btnLayout = findViewById(R.id.voiceBtnLayout);
@@ -451,20 +468,15 @@ public class ChatActivity extends EbActivity {
 				keyBtn.setVisibility(View.GONE);
 			}
 		});
+		
+		//文本输入框
 		mContentEdit.addTextChangedListener(new TextWatcher() {
-
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before,
-					int count) {
-
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
-
 			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count,
-					int after) {
-
+			public void beforeTextChanged(CharSequence s, int start, int count,int after) {
 			}
-
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (s.length() > 0) {
@@ -476,9 +488,9 @@ public class ChatActivity extends EbActivity {
 				}
 			}
 		});
-
+		
+		//发送按钮
 		sendBtn.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				String text = mContentEdit.getText().toString().trim();
@@ -487,13 +499,11 @@ public class ChatActivity extends EbActivity {
 					return;
 				}
 				if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
-					pageInfo.showError(ChatActivity.this
-							.getString(R.string.msg_error_localNoNetwork));
+					pageInfo.showError(ChatActivity.this.getString(R.string.msg_error_localNoNetwork));
 					return;
 				}
 				if (uid < 0) {
-					pageInfo.showError(ChatActivity.this
-							.getString(R.string.msg_send_uiderror));
+					pageInfo.showError(ChatActivity.this.getString(R.string.msg_send_uiderror));
 					return;
 				}
 				if (uid >= 0) {
@@ -515,47 +525,71 @@ public class ChatActivity extends EbActivity {
 				// 0);
 				// }
 			}
-
 		});
 
+		//聊天消息列表
 		mMsgListView = (ListView) this.findViewById(R.id.mListView);
-		mChatMsgViewAdapter = new ChatMsgViewAdapter(ChatActivity.this,
-				EntboostCache.getChatMsgs(uid));
+		mChatMsgViewAdapter = new ChatMsgViewAdapter(ChatActivity.this, EntboostCache.getChatMsgs(uid));
 		mMsgListView.setAdapter(mChatMsgViewAdapter);
-		mMsgListView.setSelection(mChatMsgViewAdapter.getCount() - 1);
-
+		mMsgListView.setSelection(mChatMsgViewAdapter.getCount() - 1); //滚动到最后一条记录
+		
+		//长按消息弹出菜单
 		final PopMenu popMenu = new PopMenu(this);
-		popMenu.addItem("复制文本",R.layout.item_menu, new PopMenuItemOnClickListener() {
-
+		mChatMsgViewAdapter.setPopMenu(popMenu);
+		//定义子菜单项
+		List<PopMenuItem> popMenuItems = new ArrayList<PopMenuItem>();
+		//"复制"菜单项
+		PopMenuItem item1 = new PopMenuItem("复制文本", 0, R.layout.item_menu, new PopMenuItemOnClickListener() {
 			@Override
 			public void onItemClick() {
 				ChatRoomRichMsg msg = (ChatRoomRichMsg) popMenu.getObj();
 				UIUtils.copy(msg.getTipText(), ChatActivity.this);
 				popMenu.dismiss();
 			}
-
 		});
-		mChatMsgViewAdapter.setPopMenu(popMenu);
-
-		expressionGriView = (GridView) this
-				.findViewById(R.id.expressionGridView);
+		popMenuItems.add(item1);
+		//"转发"菜单项
+		PopMenuItem item2 = new PopMenuItem("转  发", 0, R.layout.item_menu, new PopMenuItemOnClickListener() {
+			@Override
+			public void onItemClick() {
+				popMenu.dismiss();
+				
+				//切换至选择成员的界面
+				ChatRoomRichMsg msg = (ChatRoomRichMsg) popMenu.getObj();
+				Intent intent = new Intent(ChatActivity.this, MemberSelectActivity.class);
+				//intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.putExtra("msgid", msg.getMsgid());
+				
+				//把当前用户在选择界面除外
+				List<Long> excludeUids = new ArrayList<Long>();
+				excludeUids.add(UserCenter.getInstance().getUserid()); //当前登录用户编号
+				excludeUids.add(ChatActivity.this.uid); //当前一对一聊天界面的对方用户编号
+				intent.putExtra("excludeUids", (Serializable)excludeUids);
+				
+				startActivityForResult(intent, 1);
+			}
+		});
+		popMenuItems.add(item2);
+		mChatMsgViewAdapter.setPopMenuItems(popMenuItems);
+		
+		
+		//表情输入选择区域
+		expressionGriView = (GridView) this.findViewById(R.id.expressionGridView);
 		emotionsImageAdapter = new EmotionsImageAdapter(this);
 		expressionGriView.setAdapter(emotionsImageAdapter);
 		expressionGriView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				final Resource emotions = (Resource) emotionsImageAdapter.getItem(position);
 				UIUtils.addEmotions(mContentEdit, emotions);
 				emotionsAppPanel.setVisibility(View.GONE);
 			}
 		});
-
-		emotionsAppPanel = (LinearLayout) this
-				.findViewById(R.id.expressionAppPanel);
+		emotionsAppPanel = (LinearLayout) this.findViewById(R.id.expressionAppPanel);
+		
+		//"选取待发送图片"按钮
 		picBtn = (Button) this.findViewById(R.id.picBtn);
 		picBtn.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View arg0) {
 				if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
@@ -566,10 +600,10 @@ public class ChatActivity extends EbActivity {
 				getPicFromContent();
 			}
 		});
-		ImageButton emotionBtn = (ImageButton) this
-				.findViewById(R.id.emotionBtn);
+		
+		//“切换表情输入框”按钮
+		ImageButton emotionBtn = (ImageButton) this.findViewById(R.id.emotionBtn);
 		emotionBtn.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				if (emotionsAppPanel.getVisibility() == View.GONE) {
@@ -577,15 +611,14 @@ public class ChatActivity extends EbActivity {
 				} else {
 					emotionsAppPanel.setVisibility(View.GONE);
 				}
-				((BaseAdapter) expressionGriView.getAdapter())
-						.notifyDataSetChanged();
+				((BaseAdapter) expressionGriView.getAdapter()).notifyDataSetChanged();
 			}
 		});
 
+		//“其它输入方式”按钮
 		morePanel = (LinearLayout) this.findViewById(R.id.morePanel);
 		moreBtn = (ImageButton) this.findViewById(R.id.moreBtn);
 		moreBtn.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View arg0) {
 				if (morePanel.getVisibility() == View.GONE) {
@@ -595,6 +628,8 @@ public class ChatActivity extends EbActivity {
 				}
 			}
 		});
+		
+		//“选取待发送文件”按钮
 		fileBtn = (Button) this.findViewById(R.id.fileBtn);
 		if (chattype == CHATTYPE_PERSON) {
 			fileBtn.setVisibility(View.VISIBLE);
@@ -603,8 +638,7 @@ public class ChatActivity extends EbActivity {
 				@Override
 				public void onClick(View arg0) {
 					if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
-						pageInfo.showError(ChatActivity.this
-								.getString(R.string.msg_error_localNoNetwork));
+						pageInfo.showError(ChatActivity.this.getString(R.string.msg_error_localNoNetwork));
 						return;
 					}
 					getFileFromContent();
@@ -612,6 +646,20 @@ public class ChatActivity extends EbActivity {
 			});
 		} else {
 			fileBtn.setVisibility(View.GONE);
+		}
+		
+		//处理默认自动发送的消息(通常用于转发消息)
+		final Long msgId = getIntent().getLongExtra(INTENT_TO_MSG_ID, 0);
+		if (msgId>0) {
+			getIntent().removeExtra(INTENT_TO_MSG_ID);
+			//新建子线程执行
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					//调用EB API执行转发
+					EntboostCM.forwardRichMsg(msgId, ChatActivity.this.uid, ChatActivity.this.chattype==CHATTYPE_GROUP?true:false);
+				}
+			}).start();
 		}
 	}
 
@@ -732,39 +780,50 @@ public class ChatActivity extends EbActivity {
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log4jLog.i(LONG_TAG, "requestCode=" + requestCode);
-		Log4jLog.i(LONG_TAG, "resultCode=" + resultCode);
-		
 		if (resultCode != RESULT_OK) {
 			return;
 		}
 		
-//		switch(requestCode) {
-//		case 2: //image
-//			
-//			break;
-//		case 3: //file
-//			
-//			break;
-//		}
-		
-		//String filePath = getPathFromUri(data.getData());
-		String filePath = OtherUtils.getFileAbsolutePath(this, data.getData());
-		Log4jLog.i(LONG_TAG, "onActivityResult filePath:" + filePath);
-		
-		if (requestCode == 2) {// 获取手机中的图片
-			if (filePath.endsWith("jpg") || filePath.endsWith("png")) {
-				sendPic(filePath);
+		switch(requestCode) {
+		case 1: //选取转发消息的目标对象，并执行转发
+			Long msgId = data.getLongExtra("msgid", 0);
+			Long targetUid = data.getLongExtra("target_uid", 0);
+			String targetName = data.getStringExtra("target_name");
+			Log4jLog.e(LONG_TAG, "转发消息，msg_id="+msgId + ", target_uid=" + targetUid + ", target_name=" + targetName);
+			
+			if (targetUid>0 && msgId>0) {
+				//结束当前聊天窗口
+				finish();
+				//切换至对应的聊天界面
+				Intent intent = new Intent(ChatActivity.this, ChatActivity.class);
+				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+				intent.putExtra(ChatActivity.INTENT_TITLE, targetName);
+				intent.putExtra(ChatActivity.INTENT_UID, targetUid);
+				intent.putExtra(ChatActivity.INTENT_TO_MSG_ID, msgId);
+				
+				startActivity(intent);
 			}
-		} else if (requestCode == 3) {// 获取手机中的文件
-			sendFile(filePath);
+			break;
+		case 2: //获取手机中的图片
+		case 3: // 获取手机中的文件
+			//String filePath = getPathFromUri(data.getData());
+			String filePath = OtherUtils.getFileAbsolutePath(this, data.getData());
+			Log4jLog.i(LONG_TAG, "onActivityResult filePath:" + filePath);
+			
+			if (requestCode == 2) {// 获取手机中的图片
+				if (filePath.endsWith("jpg") || filePath.endsWith("png")) {
+					sendPic(filePath);
+				}
+			} else if (requestCode == 3) {// 获取手机中的文件
+				sendFile(filePath);
+			}
+			break;
 		}
 	}
 
 	public void sendPic(String picUri) {
 		if (uid < 0) {
-			pageInfo.showError(ChatActivity.this
-					.getString(R.string.msg_send_uiderror));
+			pageInfo.showError(ChatActivity.this.getString(R.string.msg_send_uiderror));
 			return;
 		}
 		if (uid >= 0) {
@@ -779,8 +838,7 @@ public class ChatActivity extends EbActivity {
 
 	public void sendFile(String filePath) {
 		if (uid < 0) {
-			pageInfo.showError(ChatActivity.this
-					.getString(R.string.msg_send_uiderror));
+			pageInfo.showError(ChatActivity.this.getString(R.string.msg_send_uiderror));
 			return;
 		}
 		if (uid >= 0) {

@@ -2,14 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.entboost.im"
     android:versionCode="1"
-    android:versionName="1.4.5.167" >
+    android:versionName="1.5.0.215" >
 
     <uses-sdk android:minSdkVersion="11" /> <!-- android:targetSdkVersion="15" -->
-
+	
     <!-- 允许应用程序联网 -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- 检测网络状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <!-- 获取用户手机的IMEI，用来唯一的标识用户 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!-- 允许在SD卡写文件(缓存资源优先存入SDcard、输出日志文件) -->
@@ -22,15 +23,30 @@
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <!-- 获取任务列表信息 -->
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <!-- 创建桌面快捷方式 -->
+    <!-- 桌面快捷方式 -->
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT" />
-
+    <uses-permission android:name="com.android.launcher.permission.UNINSTALL_SHORTCUT" /> 
+   	<!-- 阻止手机休眠 -->
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<!-- 退出程序 -->
+	<uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+	
     <application
         android:name="com.entboost.im.global.MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <activity
+            android:name="com.entboost.im.WelcomeActivity"
+            android:label="@string/title_activity_welcome"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name="com.entboost.im.user.LoginActivity"
             android:label="@string/loginTitle"
@@ -87,35 +103,24 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.DepartmentActivity"
+            android:name="com.entboost.im.group.DepartmentActivity"
             android:label="@string/title_activity_department"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.DepartmentInfoActivity"
+            android:name="com.entboost.im.group.DepartmentInfoActivity"
             android:label="@string/title_activity_department_info"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.persongroup.PersonGroupInfoActivity"
+            android:name="com.entboost.im.group.PersonGroupInfoActivity"
             android:label="@string/title_activity_persongroup_info"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.MemberInfoActivity"
+            android:name="com.entboost.im.group.MemberInfoActivity"
             android:label="@string/title_activity_member_info"
             android:screenOrientation="portrait" >
-        </activity>
-        <activity
-            android:name="com.entboost.im.WelcomeActivity"
-            android:label="@string/title_activity_welcome"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name="com.entboost.im.contact.SearchContactActivity"
@@ -143,12 +148,12 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.SelectHeadImgActivity"
+            android:name="com.entboost.im.group.SelectHeadImgActivity"
             android:label="@string/title_activity_select_head_img"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.MemberListActivity"
+            android:name="com.entboost.im.group.MemberListActivity"
             android:label="@string/title_activity_member_list"
             android:screenOrientation="portrait" >
         </activity>
@@ -182,17 +187,17 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.persongroup.PersonGroupEditActivity"
+            android:name="com.entboost.im.group.PersonGroupEditActivity"
             android:label="@string/title_activity_person_group_edit"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.persongroup.PersonGroupSelectActivity"
+            android:name="com.entboost.im.group.PersonGroupSelectActivity"
             android:label="@string/title_activity_person_group_select"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.persongroup.MemberSelectActivity"
+            android:name="com.entboost.im.group.MemberSelectActivity"
             android:label="@string/title_activity_member_select"
             android:screenOrientation="portrait" >
         </activity>
@@ -202,7 +207,7 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.DepartmentListActivity"
+            android:name="com.entboost.im.group.DepartmentListActivity"
             android:label="@string/title_activity_department_list"
             android:screenOrientation="portrait" >
         </activity>
@@ -217,28 +222,28 @@
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.EditGroupNameActivity"
+            android:name="com.entboost.im.group.EditGroupNameActivity"
             android:label="@string/title_activity_edit_group_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.EditGroupTelActivity"
+            android:name="com.entboost.im.group.EditGroupTelActivity"
             android:label="@string/title_activity_edit_group_tel_activity" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.EditGroupFaxActivity"
+            android:name="com.entboost.im.group.EditGroupFaxActivity"
             android:label="@string/title_activity_edit_group_fax" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.EditGroupEmailActivity"
+            android:name="com.entboost.im.group.EditGroupEmailActivity"
             android:label="@string/title_activity_edit_group_email" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.EditGroupHomeActivity"
+            android:name="com.entboost.im.group.EditGroupHomeActivity"
             android:label="@string/title_activity_edit_group_home" >
         </activity>
         <activity
-            android:name="com.entboost.im.department.EditGroupAddrActivity"
+            android:name="com.entboost.im.group.EditGroupAddrActivity"
             android:label="@string/title_activity_edit_group_addr" >
         </activity>
         <activity

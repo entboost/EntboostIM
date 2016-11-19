@@ -30,8 +30,7 @@ public class BroadcastMessageListActivity extends EbActivity {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_broadcast_message_list);
 		msglistView = (ListView) findViewById(R.id.msglist);
-		msgAdapter = new BroadcastMessageAdapter(this,
-				EntboostCache.getBroadcastMessages());
+		msgAdapter = new BroadcastMessageAdapter(this, EntboostCache.getBroadcastMessages());
 		msglistView.setAdapter(msgAdapter);
 		msglistView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -40,8 +39,7 @@ public class BroadcastMessageListActivity extends EbActivity {
 				// 获取该行的数据
 				BroadcastMessage msg = (BroadcastMessage) msgAdapter
 						.getItem(position);
-				Intent intent = new Intent(BroadcastMessageListActivity.this,
-						BroadcastDetailActivity.class);
+				Intent intent = new Intent(BroadcastMessageListActivity.this, BroadcastDetailActivity.class);
 				intent.putExtra("broadcastMessage", msg);
 				startActivity(intent);
 			}

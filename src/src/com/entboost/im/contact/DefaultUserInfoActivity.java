@@ -44,6 +44,7 @@ public class DefaultUserInfoActivity extends EbActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_default_user_info);
+		
 		ViewUtils.inject(this);
 		Long uid = getIntent().getLongExtra("uid", -1);
 		if (uid > 0) {
@@ -57,9 +58,8 @@ public class DefaultUserInfoActivity extends EbActivity {
 						if (img != null) {
 							userHead.setImageBitmap(img);
 						} else {
-							ImageLoader.getInstance().displayImage(member.getHeadUrl(),
-									userHead,
-									MyApplication.getInstance().getImgOptions());
+							ImageLoader.getInstance().displayImage(member.getHeadUrl(), userHead,
+									MyApplication.getInstance().getUserImgOptions());
 						}
 					}
 				}

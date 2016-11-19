@@ -14,7 +14,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:scaleType="fitXY"
-        android:src="@drawable/entboost_logo" />
+        android:src="@drawable/default_user" />
 
     <TextView
         android:id="@+id/unread_msg_num"
@@ -38,7 +38,7 @@
         android:layout_alignTop="@id/msg_head"
         android:layout_toRightOf="@id/msg_head"
         android:singleLine="true"
-        android:textColor="#194e62"
+        android:textColor="#000000"
         android:textSize="16sp" />
 
     <TextView
@@ -48,7 +48,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="7dp"
         android:layout_marginTop="6dp"
-        android:textColor="#60b1ce"
+        android:textColor="#808080"
         android:textSize="12sp" />
 
 
@@ -63,7 +63,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="4dp"
         android:singleLine="true"
-        android:textColor="#60b1ce"
+        android:textColor="#404040"
         android:textSize="13sp" />
 
 </RelativeLayout>

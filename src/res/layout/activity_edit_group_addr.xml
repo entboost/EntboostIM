@@ -22,7 +22,7 @@
         android:background="@drawable/btn_style_green1"
         android:padding="12dp"
         android:text="保存修改"
-        android:textColor="#19621c"
+        android:textColor="@color/white"
         android:textSize="16sp" />
 
     <Button
@@ -33,7 +33,7 @@
         android:background="@drawable/btn_style_w"
         android:padding="12dp"
         android:text="取消"
-        android:textColor="#29728d"
+        android:textColor="@color/text_color_2"
         android:textSize="16sp" />
 
 </LinearLayout>

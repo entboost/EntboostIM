@@ -1,6 +1,6 @@
 package com.entboost.im.chat;
 
-import net.yunim.utils.UIUtils;
+import com.entboost.im.global.UIUtils;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -31,7 +31,7 @@ public class OnlieChatMsgActivity extends EbActivity {
 		mWebView.setWebViewClient(new WebViewClient() {
 			@Override
 			public void onPageStarted(WebView view, String url, Bitmap favicon) {
-				showProgressDialog("正在努力加载，请等待");
+				showProgressDialog("正在努力加载，请稍后");
 				super.onPageStarted(view, url, favicon);
 			}
 

@@ -445,8 +445,7 @@ public abstract class AbActivity extends FragmentActivity {
 	 * @param mOkOnClickListener
 	 *            点击确认按钮的事件监听
 	 */
-	public void showDialog(String title, String msg,
-			DialogInterface.OnClickListener mOkOnClickListener) {
+	public void showDialog(String title, String msg, DialogInterface.OnClickListener mOkOnClickListener) {
 		AlertDialog.Builder builder = new Builder(this);
 		builder.setMessage(msg);
 		builder.setTitle(title);
@@ -470,8 +469,7 @@ public abstract class AbActivity extends FragmentActivity {
 	 * @param mOkOnClickListener
 	 *            点击确认按钮的事件监听
 	 */
-	public AlertDialog showDialog(String title, View view,
-			DialogInterface.OnClickListener mOkOnClickListener) {
+	public AlertDialog showDialog(String title, View view, DialogInterface.OnClickListener mOkOnClickListener) {
 		AlertDialog.Builder builder = new Builder(this);
 		builder.setTitle(title);
 		builder.setView(view);

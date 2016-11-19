@@ -1,7 +1,8 @@
 package com.entboost.im.contact;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Vector;
+import java.util.List;
 
 import net.yunim.service.entity.ContactGroup;
 import android.content.Context;
@@ -17,7 +18,7 @@ import com.entboost.im.R;
 public class ContactGroupSelectAdapter extends BaseAdapter {
 	private Context mContext;
 
-	private Vector<ContactGroup> groups = new Vector<ContactGroup>();
+	private List<ContactGroup> groups = new ArrayList<ContactGroup>();
 
 	private long ug_id = 0l;
 	private ImageButton selectImg;
@@ -33,7 +34,7 @@ public class ContactGroupSelectAdapter extends BaseAdapter {
 	public long getUg_id() {
 		return ug_id;
 	}
-
+	
 	public void setUg_id(long ug_id) {
 		this.ug_id = ug_id;
 	}
@@ -42,7 +43,7 @@ public class ContactGroupSelectAdapter extends BaseAdapter {
 		mContext = context;
 	}
 
-	public void setInput(Vector<ContactGroup> groups) {
+	public void setInput(List<ContactGroup> groups) {
 		this.groups.clear();
 		Collections.sort(groups);
 		this.groups.addAll(groups);
@@ -79,22 +80,18 @@ public class ContactGroupSelectAdapter extends BaseAdapter {
 		final GroupViewHolder holder1;
 		if (convertView == null) {
 			// 使用自定义的list_items作为Layout
-			convertView = LayoutInflater.from(mContext).inflate(
-					R.layout.item_selectcontactgroup, parent, false);
+			convertView = LayoutInflater.from(mContext).inflate(R.layout.item_selectcontactgroup, parent, false);
 			// 减少findView的次数
 			holder1 = new GroupViewHolder();
 			// 初始化布局中的元素
-			holder1.itemsText = ((TextView) convertView
-					.findViewById(R.id.user_name));
-			holder1.user_select = ((ImageButton) convertView
-					.findViewById(R.id.user_select));
+			holder1.itemsText = ((TextView) convertView.findViewById(R.id.user_name));
+			holder1.user_select = ((ImageButton) convertView.findViewById(R.id.user_select));
 			convertView.setTag(holder1);
 		} else {
 			holder1 = (GroupViewHolder) convertView.getTag();
 		}
 		holder1.itemsText.setText(group.getGroupname());
 		holder1.user_select.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				if (selectImg != null) {

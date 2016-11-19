@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:textColor="#19621c"
+        android:textColor="@color/text_color_gray"
         android:textSize="14sp" />
 
 </LinearLayout>

@@ -16,9 +16,10 @@ public class EbFragment extends Fragment {
 			activity.pageInfo.hide();
 		}
 	}
-
-	public void refreshPage() {
-		hide();
+	
+	public void refreshPage(boolean switchView) {
+		if (switchView)
+			hide();
 	};
 
 	protected View onCreateEbView(int layoutId, LayoutInflater inflater,

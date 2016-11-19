@@ -1,5 +1,6 @@
 package com.entboost.ui.base.activity;
 
+import java.util.Iterator;
 import java.util.Stack;
 
 import android.app.Activity;
@@ -49,10 +50,44 @@ public class MyActivityManager {
     // 退出栈中所有Activity
     public void clearAllActivity() {
         while (!activityStack.isEmpty()) {
-            Activity activity = activityStack.pop();  
+            Activity activity = activityStack.pop();
             if (activity != null)
                 activity.finish();
             Log4jLog.d(LONG_TAG, "clear one activity, stack size = " + activityStack.size());
         }
+    }
+    
+    /**
+     * 判断某个Activity的实例是否存在
+     * @param className 类名
+     * @return
+     */
+    public boolean isActivityExist(String className) {
+    	Iterator<Activity> it = activityStack.iterator();
+    	while (it.hasNext()) {
+    		Activity activity = (Activity)it.next();
+    		if (activity.getClass().getName().equals(className)) {
+    			return true;
+    		}
+    	}
+    	
+    	Log4jLog.d(LONG_TAG, "activity instance for " + className + " is not exist");
+    	return false;
+    }
+    
+    /**
+     * 获取一个指定的Activity实例
+     * @param className 类全名
+     * @return
+     */
+    public Activity getActivity(String className) {
+    	Iterator<Activity> it = activityStack.iterator();
+    	while (it.hasNext()) {
+    		Activity activity = (Activity)it.next();
+    		if (activity.getClass().getName().equals(className)) {
+    			return activity;
+    		}
+    	}
+    	return null;
     }
 }

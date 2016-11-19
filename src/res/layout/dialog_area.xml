@@ -57,10 +57,10 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/btn_style_w"
+            android:background="@drawable/btn_style_green1"
             android:padding="10dp"
             android:text="确定"
-            android:textColor="#29728d"
+            android:textColor="@color/white"
             android:textSize="14sp" />
 
         <Button
@@ -69,10 +69,10 @@
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
             android:layout_weight="1"
-            android:background="@drawable/btn_style_red"
+            android:background="@drawable/btn_style_w"
             android:padding="10dp"
             android:text="取消"
-            android:textColor="#fff"
+            android:textColor="@color/text_color_2"
             android:textSize="14sp" />
     </LinearLayout>
 

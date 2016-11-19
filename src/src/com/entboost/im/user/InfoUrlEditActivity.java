@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.lidroid.xutils.ViewUtils;
@@ -32,18 +33,27 @@ public class InfoUrlEditActivity extends EbActivity {
 		String sinfoUrl=infoUrl.getText().toString();
 		showProgressDialog("修改用户主页");
 		EntboostUM.editUserInfo(null, null, -1, null, -1, null, -1,
-				null, -1, null, null, sinfoUrl, -1, null, null, null, -1, null,
-				null, new EditInfoListener() {
+				null, -1, null, null, sinfoUrl, -1, null, null, null, -1, null, null, new EditInfoListener() {
 			@Override
-			public void onFailure(String errMsg) {
-				pageInfo.showError(errMsg);
-				removeProgressDialog();
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						pageInfo.showError(errMsg);
+						removeProgressDialog();
+					}
+				});
 			}
 			
 			@Override
 			public void onEditInfoSuccess() {
-				removeProgressDialog();
-				finish();
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						removeProgressDialog();
+						finish();
+					}
+				});
 			}
 		});
 	}

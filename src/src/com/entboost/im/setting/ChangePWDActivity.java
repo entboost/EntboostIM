@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.lidroid.xutils.ViewUtils;
@@ -52,22 +53,30 @@ public class ChangePWDActivity extends EbActivity {
 			pageInfo.hide();
 		}
 		showProgressDialog("修改用户密码");
-		EntboostUM.changePassword(changepwd_passwd_str,
-				changepwd_oldpasswd_str, new EditInfoListener() {
-
+		EntboostUM.changePassword(changepwd_passwd_str, changepwd_oldpasswd_str, new EditInfoListener() {
+			@Override
+			public void onFailure(final String errMsg) {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onFailure(String errMsg) {
+					public void run() {
 						pageInfo.showError(errMsg);
 						removeProgressDialog();
 					}
-
+				});
+			}
+			
+			@Override
+			public void onEditInfoSuccess() {
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
-					public void onEditInfoSuccess() {
+					public void run() {
 						pageInfo.hide();
 						removeProgressDialog();
 						finish();
 					}
 				});
+			}
+		});
 	}
 
 	@OnClick(R.id.cancel)

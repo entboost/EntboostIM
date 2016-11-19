@@ -1,5 +1,6 @@
 package com.entboost.im.function;
 
+import java.util.List;
 import java.util.Vector;
 
 import net.yunim.service.entity.FuncInfo;
@@ -25,13 +26,13 @@ public class FunctionAdapter extends BaseAdapter {
 	// xml转View对象
 	private Vector<FuncInfo> list = new Vector<FuncInfo>();
 
-	public FunctionAdapter(Context context, Vector<FuncInfo> list) {
+	public FunctionAdapter(Context context, List<FuncInfo> list) {
 		this.mContext = context;
 		// 用于将xml转为View
 		this.list.addAll(list);
 	}
 
-	public void setList(Vector<FuncInfo> list) {
+	public void setList(List<FuncInfo> list) {
 		this.list.clear();
 		this.list.addAll(list);
 	}
@@ -56,32 +57,34 @@ public class FunctionAdapter extends BaseAdapter {
 		ViewHolder holder;
 		if (convertView == null) {
 			// 使用自定义的list_items作为Layout
-			convertView = LayoutInflater.from(mContext).inflate(
-					R.layout.item_funcinfo, parent, false);
+			convertView = LayoutInflater.from(mContext).inflate(R.layout.item_funcinfo, parent, false);
 			// 减少findView的次数
 			holder = new ViewHolder();
 			// 初始化布局中的元素
-			holder.itemsIcon = ((ImageView) convertView
-					.findViewById(R.id.msg_head));
-			holder.itemsTitle = ((TextView) convertView
-					.findViewById(R.id.msg_name));
+			holder.itemsIcon = ((ImageView) convertView.findViewById(R.id.msg_head));
+			holder.itemsTitle = ((TextView) convertView.findViewById(R.id.msg_name));
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
 
 		// 获取该行的数据
-		FuncInfo obj = (FuncInfo) getItem(position);
-		holder.itemsTitle.setText(obj.getFunc_name());
-		if (StringUtils.isNotBlank(obj.getIcon_res_id())) {
-			Bitmap img = ResourceUtils.getHeadBitmap(Long.valueOf(obj
-					.getIcon_res_id()));
+		FuncInfo funcInfo = (FuncInfo) getItem(position);
+		holder.itemsTitle.setText(funcInfo.getFunc_name());
+		if (StringUtils.isNotBlank(funcInfo.getIcon_res_id())) {
+			Bitmap img = ResourceUtils.getHeadBitmap(Long.valueOf(funcInfo.getIcon_res_id()));
 			if (img != null) {
 				holder.itemsIcon.setImageBitmap(img);
 			} else {
-				ImageLoader.getInstance().displayImage(obj.getIconUrl(),
-						holder.itemsIcon,
-						MyApplication.getInstance().getImgOptions());
+				//设置几个内置应用的图标
+				if (funcInfo.getSub_id().equals("1002300102")) {
+					holder.itemsIcon.setImageResource(R.drawable.subid_1002300102);
+				} else if (funcInfo.getSub_id().equals("1002300103")) {
+					holder.itemsIcon.setImageResource(R.drawable.message_head);
+				} else if (funcInfo.getSub_id().equals("1002300104")) {
+					holder.itemsIcon.setImageResource(R.drawable.subid_1002300104);
+				} else 
+					ImageLoader.getInstance().displayImage(funcInfo.getIconUrl(), holder.itemsIcon, MyApplication.getInstance().getFuncInfoImgOptions());
 			}
 		}
 		return convertView;

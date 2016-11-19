@@ -27,8 +27,7 @@ public class FileAdapter extends BaseAdapter{
 	
 	public FileAdapter(Context context) {
 		super();
-		this.mInflater = (LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
 
 	@Override

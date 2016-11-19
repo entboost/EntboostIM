@@ -22,8 +22,8 @@ import com.entboost.im.base.EbMainActivity;
 import com.entboost.im.chat.CallListActivity;
 import com.entboost.im.chat.ChatActivity;
 import com.entboost.im.function.FunctionMainActivity;
-import com.entboost.ui.base.view.pupmenu.PopMenu;
-import com.entboost.ui.base.view.pupmenu.PopMenuItemOnClickListener;
+import com.entboost.ui.base.view.popmenu.PopMenu;
+import com.entboost.ui.base.view.popmenu.PopMenuItemOnClickListener;
 
 public class MessageListFragment extends EbFragment {
 
@@ -43,91 +43,78 @@ public class MessageListFragment extends EbFragment {
 			dynamicNewsAdapter.notifyDataSetChanged();
 			int noReadNums = EntboostCache.getUnreadNumDynamicNews();
 			if (noReadNums > 0) {
-				((EbMainActivity) activity).mBottomTabView.getItem(0).showTip(
-						noReadNums);
+				((EbMainActivity) activity).mBottomTabView.getItem(0).showTip(noReadNums);
 			} else {
 				((EbMainActivity) activity).mBottomTabView.getItem(0).hideTip();
 			}
 		}
 	}
 
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		final View view = onCreateEbView(R.layout.fragment_message_list,
-				inflater, container);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		final View view = onCreateEbView(R.layout.fragment_message_list, inflater, container);
 		mAbPullListView = (ListView) view.findViewById(R.id.mListView);
-		dynamicNewsAdapter = new MessageAdapter(view.getContext(), inflater,
-				EntboostCache.getHistoryMsgList());
+		dynamicNewsAdapter = new MessageAdapter(view.getContext(), inflater, EntboostCache.getHistoryMsgList());
 		mAbPullListView.setAdapter(dynamicNewsAdapter);
 		mAbPullListView.setLongClickable(true);
+		
 		final PopMenu popMenu = new PopMenu(view.getContext());
 		popMenu.addItem("删除该聊天",R.layout.item_menu, new PopMenuItemOnClickListener() {
-
 			@Override
 			public void onItemClick() {
-				EntboostCache.clearMsgHistory((DynamicNews) popMenu.getObj());
+				EntboostCache.delDynamicNews((DynamicNews) popMenu.getObj());
 				dynamicNewsAdapter.setList(EntboostCache.getHistoryMsgList());
 				dynamicNewsAdapter.notifyDataSetChanged();
-				((MainActivity) activity).mBottomTabView.getItem(0).showTip(
-						EntboostCache.getUnreadNumDynamicNews());
+				((MainActivity) activity).mBottomTabView.getItem(0).showTip(EntboostCache.getUnreadNumDynamicNews());
 			}
-
 		});
+		
 		popMenu.addItem("删除所有聊天",R.layout.item_menu, new PopMenuItemOnClickListener() {
-
 			@Override
 			public void onItemClick() {
 				EntboostCache.clearAllMsgHistory();
 				dynamicNewsAdapter.setList(EntboostCache.getHistoryMsgList());
 				dynamicNewsAdapter.notifyDataSetChanged();
-				((MainActivity) activity).mBottomTabView.getItem(0).showTip(
-						EntboostCache.getUnreadNumDynamicNews());
+				((MainActivity) activity).mBottomTabView.getItem(0).showTip(EntboostCache.getUnreadNumDynamicNews());
 			}
-
 		});
-		mAbPullListView
-				.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-					@Override
-					public boolean onItemLongClick(AdapterView<?> arg0,
-							View arg1, int arg2, long arg3) {
-						DynamicNews newsInfo = (DynamicNews) dynamicNewsAdapter
-								.getItem(arg2);
-						popMenu.setObj(newsInfo);
-						popMenu.showCenter(view);
-						return true;
-					}
-				});
+		
+		mAbPullListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+				DynamicNews newsInfo = (DynamicNews) dynamicNewsAdapter.getItem(arg2);
+				popMenu.setObj(newsInfo);
+				popMenu.showCenter(view);
+				return true;
+			}
+		});
+		
 		// item被点击事件
 		mAbPullListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				// 获取该行的数据
-				DynamicNews newsInfo = (DynamicNews) dynamicNewsAdapter
-						.getItem(position);
+				DynamicNews newsInfo = (DynamicNews) dynamicNewsAdapter.getItem(position);
 				if (newsInfo != null) {
-					newsInfo.readAll();
+					//标记当前选中的会话为已读状态
+					//newsInfo.readAll();
+					EntboostCache.markReadDynamicNewsById(newsInfo.getId());
+					
+					//读取并显示全部未读消息的总数量
 					int noReadNums = EntboostCache.getUnreadNumDynamicNews();
 					if (noReadNums > 0) {
-						((EbMainActivity) activity).mBottomTabView.getItem(0)
-								.showTip(noReadNums);
+						((EbMainActivity) activity).mBottomTabView.getItem(0).showTip(noReadNums);
 					} else {
-						((EbMainActivity) activity).mBottomTabView.getItem(0)
-								.hideTip();
+						((EbMainActivity) activity).mBottomTabView.getItem(0).hideTip();
 					}
-					if (newsInfo.getType() == DynamicNews.TYPE_GROUPCHAT
-							|| newsInfo.getType() == DynamicNews.TYPE_USERCHAT) {
-						Intent intent = new Intent(MessageListFragment.this
-								.getActivity(), ChatActivity.class);
+					
+					if (newsInfo.getType() == DynamicNews.TYPE_GROUPCHAT || newsInfo.getType() == DynamicNews.TYPE_USERCHAT) {
+						Intent intent = new Intent(MessageListFragment.this.getActivity(), ChatActivity.class);
 						if (newsInfo.getType() == DynamicNews.TYPE_GROUPCHAT) {
-							intent.putExtra(ChatActivity.INTENT_CHATTYPE,
-									ChatActivity.CHATTYPE_GROUP);
+							intent.putExtra(ChatActivity.INTENT_CHATTYPE, ChatActivity.CHATTYPE_GROUP);
 						}
-						intent.putExtra(ChatActivity.INTENT_TITLE,
-								newsInfo.getTitle());
-						intent.putExtra(ChatActivity.INTENT_UID,
-								newsInfo.getSender());
+						intent.putExtra(ChatActivity.INTENT_TITLE, newsInfo.getTitle());
+						intent.putExtra(ChatActivity.INTENT_UID, newsInfo.getSender());
 						startActivity(intent);
 					} else if (newsInfo.getType() == DynamicNews.TYPE_CALL) {
 						Intent intent = new Intent(MessageListFragment.this

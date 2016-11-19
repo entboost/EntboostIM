@@ -106,7 +106,7 @@
                     android:layout_centerVertical="true"
                     android:background="@drawable/btn_style_blue1"
                     android:text="按住说话"
-                    android:textColor="#509eb8"
+                    android:textColor="@color/black"
                     android:textSize="16sp" />
             </RelativeLayout>
 
@@ -137,7 +137,7 @@
                     android:background="@drawable/btn_style_blue1"
                     android:gravity="center_horizontal|center_vertical"
                     android:text="发送"
-                    android:textColor="#509eb8"
+                    android:textColor="@color/black"
                     android:textSize="16sp"
                     android:visibility="gone" />
             </LinearLayout>
@@ -172,7 +172,7 @@
             android:id="@+id/expressionAppPanel"
             android:layout_width="fill_parent"
             android:layout_height="200dip"
-            android:background="@color/mainPageBG"
+            android:background="@color/white"
             android:orientation="vertical"
             android:paddingTop="10dp"
             android:visibility="gone" >

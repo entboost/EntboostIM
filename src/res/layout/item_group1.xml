@@ -32,15 +32,36 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/item_group_head"
-        android:textColor="#194e62"
+        android:textColor="@color/text_color_2"
         android:textSize="16sp" />
-
+    
     <ImageView
-        android:id="@+id/item_group_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/ui62new" />
+    android:id="@+id/item_call_talk"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_marginRight="5dp"
+    android:layout_toLeftOf="@+id/item_group_info"
+    android:src="@drawable/ui63new" />
+    
+    <ImageView
+    android:id="@+id/item_group_info"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_marginRight="5dp"
+    android:layout_toLeftOf="@+id/select_all"
+    android:src="@drawable/ui62new" />
+    
+    <ImageView
+    android:id="@+id/select_all"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerVertical="true"
+    android:layout_alignParentRight="true"
+    android:layout_marginRight="8dp"
+    android:background="@drawable/uitb_45"
+    android:focusable="false"
+    android:scaleType="fitXY" />
 
 </RelativeLayout>

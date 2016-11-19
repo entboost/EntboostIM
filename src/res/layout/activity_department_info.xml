@@ -27,7 +27,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:padding="8dp"
-                android:src="@drawable/group_head" />
+                android:src="@drawable/group_head_0" />
 
             <TextView
                 android:id="@+id/department_username"
@@ -36,7 +36,7 @@
                 android:layout_alignTop="@id/department_head"
                 android:layout_marginTop="8dp"
                 android:layout_toRightOf="@id/department_head"
-                android:textColor="#194e62"
+                android:textColor="@color/text_color_2"
                 android:textSize="18sp" />
 
             <TextView
@@ -47,7 +47,7 @@
                 android:layout_below="@id/department_username"
                 android:layout_marginTop="3dp"
                 android:text="编号："
-                android:textColor="#60b1ce"
+                android:textColor="@color/text_color_gray"
                 android:textSize="12sp" />
 
             <TextView
@@ -57,7 +57,7 @@
                 android:layout_alignBaseline="@+id/textView2"
                 android:layout_alignBottom="@+id/textView2"
                 android:layout_toRightOf="@+id/textView2"
-                android:textColor="#60b1ce"
+                android:textColor="@color/text_color_gray"
                 android:textSize="12sp" />
 
             <TextView
@@ -66,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/textView2"
                 android:layout_toRightOf="@id/department_head"
-                android:textColor="#60b1ce"
+                android:textColor="@color/text_color_gray"
                 android:textSize="12sp" />
 
             <ImageView
@@ -99,7 +99,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:text="人数"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -109,7 +109,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
                 
             </RelativeLayout>
@@ -127,7 +127,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:text="电话"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -139,7 +139,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginRight="8dp"
                     android:singleLine="true" 
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -156,7 +156,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:text="传真"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -168,7 +168,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginRight="8dp"
                     android:singleLine="true" 
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -186,7 +186,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:text="邮箱"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -198,7 +198,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginRight="8dp"
                     android:singleLine="true" 
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -215,7 +215,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:text="公司"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -225,7 +225,7 @@
                     android:layout_alignParentRight="true"
                     android:layout_centerVertical="true"
                     android:layout_marginRight="8dp"
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -242,7 +242,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:text="主页"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -254,7 +254,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginRight="8dp"
                     android:singleLine="true" 
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
 
@@ -271,7 +271,7 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="15dp"
                     android:text="地址"
-                    android:textColor="#194e62"
+                    android:textColor="@color/text_color_2"
                     android:textSize="16sp" />
 
                 <TextView
@@ -283,7 +283,7 @@
                     android:gravity="center_vertical"
                     android:layout_marginRight="8dp"
                     android:singleLine="true" 
-                    android:textColor="#60b1ce"
+                    android:textColor="@color/text_color_gray"
                     android:textSize="12sp" />
             </RelativeLayout>
         </LinearLayout>
@@ -306,7 +306,7 @@
                 android:background="@drawable/btn_style_green1"
                 android:padding="10dp"
                 android:text="发送消息"
-                android:textColor="#29728d"
+                android:textColor="@color/white"
                 android:textSize="14sp" />
 
             <Button
@@ -318,7 +318,7 @@
                 android:background="@drawable/btn_style_green1"
                 android:padding="10dp"
                 android:text="添加员工"
-                android:textColor="#29728d"
+                android:textColor="@color/white"
                 android:textSize="14sp"
                 android:visibility="gone" />
 
@@ -327,10 +327,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@drawable/btn_style_red"
+                android:background="@drawable/btn_style_w"
                 android:padding="10dp"
                 android:text="解散部门"
-                android:textColor="#333"
+                android:textColor="@drawable/btn_text_color_2"
                 android:textSize="14sp"
                 android:visibility="gone" />
         </LinearLayout>

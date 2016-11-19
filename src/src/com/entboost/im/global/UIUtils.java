@@ -1,0 +1,322 @@
+package com.entboost.im.global;
+
+import java.util.List;
+
+import net.yunim.service.constants.EB_RESOURCE_TYPE;
+import net.yunim.service.entity.Resource;
+import net.yunim.utils.ResourceUtils;
+
+import org.apache.commons.lang3.StringUtils;
+
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
+import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.text.Html;
+import android.text.Html.ImageGetter;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.entboost.im.R;
+import com.entboost.ui.utils.AbViewUtil;
+
+public class UIUtils {
+	
+	public static int messageNotificationID = 100;
+	
+	/** 屏幕宽度. */
+	public static int diaplayWidth = 320;
+
+	/**
+	 * 描述：Toast提示文本.
+	 * 
+	 * @param text
+	 *            文本
+	 */
+	public static void showToast(Context context, String text) {
+		Toast.makeText(context, "" + text, Toast.LENGTH_SHORT).show();
+	}
+
+	public static void showWindow(View parent, ListView view,
+			final OnItemClickListener listener) {
+		AbViewUtil.measureView(view);
+		int popWidth = parent.getMeasuredWidth();
+		if (view.getMeasuredWidth() > parent.getMeasuredWidth()) {
+			popWidth = view.getMeasuredWidth();
+		}
+		int popMargin = 0;
+		final PopupWindow popupWindow = new PopupWindow(
+				(View) view.getParent(), popWidth, LayoutParams.WRAP_CONTENT,
+				true);
+		int[] location = new int[2];
+		popMargin = parent.getMeasuredHeight();
+		parent.getLocationInWindow(location);
+		// int startX = location[0] - parent.getLeft();
+		int startX = location[0];
+		// if (startX + popWidth >= diaplayWidth) {
+		// startX = diaplayWidth - popWidth - 2;
+		// }
+
+		// 使其聚集
+		popupWindow.setFocusable(true);
+		// 设置允许在外点击消失
+		popupWindow.setOutsideTouchable(true);
+		// 这个是为了点击“返回Back”也能使其消失，并且并不会影响你的背景
+		popupWindow.setBackgroundDrawable(new ColorDrawable(
+				android.R.color.transparent));
+
+		popupWindow.showAtLocation(parent, Gravity.BOTTOM | Gravity.LEFT,
+				startX, popMargin);
+		// 刷新状态
+		popupWindow.update();
+		popupWindow.setTouchInterceptor(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+					popupWindow.dismiss();
+					return true;
+				}
+				return false;
+			}
+
+		});
+		view.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				listener.onItemClick(arg0, arg1, arg2, arg3);
+				popupWindow.dismiss();
+			}
+		});
+	}
+
+	/**
+	 * 程序是否在前台运行
+	 * 
+	 * @return
+	 */
+	public static boolean isAppOnForeground(Context applicationContext) {
+		// Returns a list of application processes that are running on the
+		// device
+		ActivityManager activityManager = (ActivityManager) applicationContext
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		String packageName = applicationContext.getPackageName();
+		List<RunningAppProcessInfo> appProcesses = activityManager
+				.getRunningAppProcesses();
+		if (appProcesses == null)
+			return false;
+		for (RunningAppProcessInfo appProcess : appProcesses) {
+			// The name of the process that this object is associated with.
+			if (appProcess.processName.equals(packageName)
+					&& appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * 将表情资源添加到文本编辑框中
+	 * 
+	 * @param mContentEdit
+	 *            文本编辑框
+	 * @param emotions
+	 *            表情资源对象
+	 */
+	public static void addEmotions(EditText mContentEdit,
+			final Resource emotions) {
+		String newText = emotions.getResourceStr();
+		SpannableString ss = new SpannableString(newText);
+		BitmapDrawable drawable = new BitmapDrawable(
+				ResourceUtils.getResourceBitmap(emotions.getRes_id(),
+						EB_RESOURCE_TYPE.EB_RESOURCE_EMOTION.ordinal()));
+		drawable.setBounds(0, 0, 35, 35);// 设置表情图片的显示大小
+		ImageSpan dspan = new ImageSpan(drawable, ImageSpan.ALIGN_BOTTOM);
+		ss.setSpan(dspan, 0, newText.length(),
+				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		mContentEdit.getText().insert(mContentEdit.getSelectionStart(), ss);
+	}
+
+	/**
+	 * android界面展示html代码（包含图片）
+	 * 
+	 * @param html
+	 * @return
+	 */
+	public static CharSequence getTipCharSequence(String html) {
+		if (StringUtils.isBlank(html)) {
+			return "";
+		}
+		html = html.replaceAll("\r\n", "<br/>");
+		html = html.replaceAll("\n", "<br/>");
+		html = html.replaceAll("\r", "<br/>");
+		CharSequence charSequence = Html.fromHtml(html, new ImageGetter() {
+			@Override
+			public Drawable getDrawable(String source) {
+				BitmapDrawable drawable = new BitmapDrawable(ResourceUtils
+						.getResourceBitmap(Long.valueOf(source),
+								EB_RESOURCE_TYPE.EB_RESOURCE_EMOTION.ordinal()));
+				drawable.setBounds(0, 0, 35, 35);// 设置表情图片的显示大小
+				return drawable;
+			}
+		}, null);
+		return charSequence;
+	}
+
+	public static CharSequence getTipCharSequence(String html, int length) {
+		CharSequence charSequence = getTipCharSequence(html);
+		if (charSequence.length() > length + 1) {
+			return charSequence.subSequence(0, length) + "...";
+		} else {
+			return charSequence;
+		}
+
+	}
+
+	public static void sendNotificationMsg(Context context, int icon,
+			CharSequence title, CharSequence content, int number,
+			Intent notificationIntent) {
+		// 定义NotificationManager
+		NotificationManager mNotificationManager = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification mNotification = new Notification(icon, "[" + title + "]"
+				+ content, System.currentTimeMillis());
+		mNotification.defaults = Notification.DEFAULT_SOUND;
+		mNotification.flags = Notification.FLAG_AUTO_CANCEL;
+		// 第二个参数是打开通知栏后的标题， 第三个参数是通知内容
+		mNotification.setLatestEventInfo(context, title, content, PendingIntent
+				.getActivity(context, 0, notificationIntent,
+						PendingIntent.FLAG_UPDATE_CURRENT));
+		// if (mNotification.contentView != null) {
+		// AppAccountInfo appInfo = EntboostCache.getAppInfo();
+		// if (appInfo != null && appInfo.getEnt_logo_url() != null) {
+		// Class<?> clazz;
+		// try {
+		// clazz = Class.forName("com.android.internal.R$id");
+		// Field field = clazz.getField("icon");
+		// field.setAccessible(true);
+		// int id_icon = field.getInt(null);
+		// mNotification.contentView.setImageViewBitmap(id_icon,
+		// AbFileUtil.getBitmapFromSDCache(
+		// appInfo.getEnt_logo_url(),
+		// AbImageUtil.SCALEIMG, 32, 32));
+		// } catch (Exception e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// }
+		// }
+		mNotificationManager.notify(messageNotificationID, mNotification);
+	}
+
+	/**
+	 * 实现文本复制功能
+	 * 
+	 * @param content
+	 */
+	public static void copy(String content, Context context) {
+		// 得到剪贴板管理器
+		ClipboardManager cmb = (ClipboardManager) context
+				.getSystemService(Context.CLIPBOARD_SERVICE);
+		cmb.setText(content.trim());
+	}
+
+	/**
+	 * 实现粘贴功能 add by wangqianzhou
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static String paste(Context context) {
+		// 得到剪贴板管理器
+		ClipboardManager cmb = (ClipboardManager) context
+				.getSystemService(Context.CLIPBOARD_SERVICE);
+		return cmb.getText().toString().trim();
+	}
+
+	//暂存自定义进度显示框
+	private static Dialog customProgressDialog;
+	
+	/**
+	 * 创建自定义的进度显示框
+	 * @param context 上下文
+	 * @param msg 描述内容
+	 * @return
+	 */
+	private static Dialog createLoadingDialog(Context context, String msg) {
+		LayoutInflater inflater = LayoutInflater.from(context);
+		View v = inflater.inflate(R.layout.loading_dialog, null);// 得到加载view
+		
+		LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);// 加载布局
+		ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
+		TextView tipTextView = (TextView) v.findViewById(R.id.tipTextView);// 提示文字
+		
+		// 加载动画
+		Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(context, R.anim.loading_animation);
+		// 使用ImageView显示动画
+		spaceshipImage.startAnimation(hyperspaceJumpAnimation);
+		tipTextView.setText(msg);// 设置加载信息
+
+		Dialog loadingDialog = new Dialog(context, R.style.loading_dialog);// 创建自定义样式dialog
+
+		loadingDialog.setCancelable(false);// 不可以用“返回键”取消
+		loadingDialog.setContentView(layout, new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.FILL_PARENT,
+				LinearLayout.LayoutParams.FILL_PARENT));// 设置布局
+		return loadingDialog;
+	}
+	
+	/**
+	 * 显示进度框
+	 * @param context 上下文
+	 * @param message 描述内容
+	 */
+	public static void showProgressDialog(Context context, String message) {
+		if (customProgressDialog == null) {
+			customProgressDialog = createLoadingDialog(context, message);
+			// 设置点击屏幕Dialog不消失
+			customProgressDialog.setCanceledOnTouchOutside(false);
+			customProgressDialog.show();
+		}
+	}
+	
+	/**
+	 * 关闭进度框.
+	 */
+	public static void removeProgressDialog() {
+		if (customProgressDialog != null) {
+			try {
+				customProgressDialog.dismiss();
+			} catch (Exception e) {
+			}
+			customProgressDialog = null;
+		}
+	}
+}

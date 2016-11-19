@@ -19,7 +19,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="不超过100字"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearanceSmall" 
+        android:textColor="@color/text_color_gray" />
 
     <Button
         android:id="@+id/infodes_save_btn"
@@ -29,7 +30,7 @@
         android:background="@drawable/btn_style_green1"
         android:text="保存修改"
         android:padding="12dp"
-        android:textColor="#19621c"
+        android:textColor="@color/white"
         android:textSize="16sp"/>
     
     <Button
@@ -40,7 +41,7 @@
         android:background="@drawable/btn_style_w"
         android:text="取消"
         android:padding="12dp"
-         android:textColor="#29728d"
+         android:textColor="@color/text_color_2"
         android:textSize="16sp" />
 
 </LinearLayout>

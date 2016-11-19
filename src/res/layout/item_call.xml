@@ -24,7 +24,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/entboost_logo" />
+                android:src="@drawable/default_user" />
         </RelativeLayout>
 
         <TextView

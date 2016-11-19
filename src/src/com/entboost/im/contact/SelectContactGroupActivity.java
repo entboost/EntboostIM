@@ -21,12 +21,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
-import com.entboost.ui.base.view.pupmenu.PopMenu;
-import com.entboost.ui.base.view.pupmenu.PopMenuConfig;
-import com.entboost.ui.base.view.pupmenu.PopMenuItem;
-import com.entboost.ui.base.view.pupmenu.PopMenuItemOnClickListener;
+import com.entboost.ui.base.view.popmenu.PopMenu;
+import com.entboost.ui.base.view.popmenu.PopMenuConfig;
+import com.entboost.ui.base.view.popmenu.PopMenuItem;
+import com.entboost.ui.base.view.popmenu.PopMenuItemOnClickListener;
 
 public class SelectContactGroupActivity extends EbActivity {
 	private ListView mAbPullListView;
@@ -38,14 +39,15 @@ public class SelectContactGroupActivity extends EbActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_select_contact_group);
+		
 		mAbPullListView = (ListView) findViewById(R.id.mListView);
 		contactGroupSelectAdapter = new ContactGroupSelectAdapter(this);
 		contactGroupSelectAdapter.setInput(EntboostCache.getContactGroups());
 		mAbPullListView.setAdapter(contactGroupSelectAdapter);
 		con_id = getIntent().getLongExtra("con_id", -1);
 		popMenu = new PopMenu(this);
+		
 		popMenu.addItem("编辑分组",R.layout.item_menu, new PopMenuItemOnClickListener() {
-
 			@Override
 			public void onItemClick() {
 				final ContactGroup contactGroup = (ContactGroup) popMenu
@@ -62,53 +64,69 @@ public class SelectContactGroupActivity extends EbActivity {
 							return;
 						}
 						showProgressDialog("正在编辑分组！");
-						EntboostUM.editContactGroup(contactGroup.getUgid(),
-								value, new EditGroupListener() {
-
+						EntboostUM.editContactGroup(contactGroup.getUgid(), value, new EditGroupListener() {
+							@Override
+							public void onFailure(final String errMsg) {
+								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 									@Override
-									public void onFailure(String errMsg) {
+									public void run() {
 										removeProgressDialog();
 										showToast(errMsg);
 									}
-
+								});
+							}
+							@Override
+							public void onEditGroupSuccess(Long dep_code) {
+								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 									@Override
-									public void onEditGroupSuccess(Long dep_code) {
+									public void run() {
 										removeProgressDialog();
 										contactGroupSelectAdapter.setInput(EntboostCache.getContactGroups());
 										contactGroupSelectAdapter.notifyDataSetChanged();
 									}
 								});
+							}
+						});
 					}
 				});
 			}
 
 		});
+		
 		popMenu.addItem("删除分组",R.layout.item_menu, new PopMenuItemOnClickListener() {
 
 			@Override
 			public void onItemClick() {
 				ContactGroup contactGroup = (ContactGroup) popMenu.getObj();
 				showProgressDialog("正在删除分组！");
-				EntboostUM.delContactGroup(contactGroup.getUgid(),
-						new DelGroupListener() {
-
+				EntboostUM.delContactGroup(contactGroup.getUgid(), new DelGroupListener() {
 							@Override
-							public void onFailure(String errMsg) {
-								removeProgressDialog();
-								showToast(errMsg);
+							public void onFailure(final String errMsg) {
+								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+									@Override
+									public void run() {
+										removeProgressDialog();
+										showToast(errMsg);
+									}
+								});
 							}
-
 							@Override
 							public void onDelGroupSuccess() {
-								removeProgressDialog();
-								contactGroupSelectAdapter.setInput(EntboostCache.getContactGroups());
-								contactGroupSelectAdapter.notifyDataSetChanged();
+								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+									@Override
+									public void run() {
+										removeProgressDialog();
+										contactGroupSelectAdapter.setInput(EntboostCache.getContactGroups());
+										contactGroupSelectAdapter.notifyDataSetChanged();
+									}
+								});
 							}
 
 						});
 			}
 
 		});
+		
 		mAbPullListView
 				.setOnItemLongClickListener(new OnItemLongClickListener() {
 
@@ -122,6 +140,7 @@ public class SelectContactGroupActivity extends EbActivity {
 						return false;
 					}
 				});
+		
 		mAbPullListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -172,54 +191,63 @@ public class SelectContactGroupActivity extends EbActivity {
 									return;
 								}
 								showProgressDialog("正在添加分组！");
-								EntboostUM.addContactGroup(value,
-										new EditGroupListener() {
-
+								EntboostUM.addContactGroup(value, new EditGroupListener() {
+									@Override
+									public void onFailure(final String errMsg) {
+										HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 											@Override
-											public void onFailure(String errMsg) {
+											public void run() {
 												removeProgressDialog();
 												showToast(errMsg);
 											}
-
+										});
+									}
+									@Override
+									public void onEditGroupSuccess(Long dep_code) {
+										HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 											@Override
-											public void onEditGroupSuccess(
-													Long dep_code) {
+											public void run() {
 												removeProgressDialog();
 												contactGroupSelectAdapter.setInput(EntboostCache.getContactGroups());
 												contactGroupSelectAdapter.notifyDataSetChanged();
 											}
 										});
+									}
+								});
 							}
 						});
 					}
 
 				}));
-		this.getTitleBar().addRightImageButton(R.drawable.ic_action_save, null,
-				new PopMenuItem(new PopMenuItemOnClickListener() {
+		this.getTitleBar().addRightImageButton(R.drawable.ic_action_save, null, new PopMenuItem(new PopMenuItemOnClickListener() {
 
+			@Override
+			public void onItemClick() {
+				showProgressDialog("正在移动到其它分组");
+				EntboostUM.moveContact(con_id, contactGroupSelectAdapter.getUg_id(), new EditContactListener() {
 					@Override
-					public void onItemClick() {
-						showProgressDialog("正在移动到其它分组");
-						EntboostUM.moveContact(con_id,
-								contactGroupSelectAdapter.getUg_id(),
-								new EditContactListener() {
-
-									@Override
-									public void onFailure(String errMsg) {
-										removeProgressDialog();
-										showToast(errMsg);
-									}
-
-									@Override
-									public void onEditContactSuccess() {
-										removeProgressDialog();
-										finish();
-									}
-
-								});
+					public void onFailure(final String errMsg) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								removeProgressDialog();
+								showToast(errMsg);
+							}
+						});
 					}
-
-				}));
+					@Override
+					public void onEditContactSuccess() {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								removeProgressDialog();
+								finish();
+							}
+						});
+					}
+				});
+			}
+		}));
 	}
 
 }

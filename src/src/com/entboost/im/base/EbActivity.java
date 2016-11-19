@@ -8,7 +8,6 @@ import net.yunim.service.entity.ChatRoomRichMsg;
 import net.yunim.service.entity.DynamicNews;
 import net.yunim.service.entity.FileCache;
 import net.yunim.service.entity.SysMessage;
-import net.yunim.utils.UIUtils;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import android.widget.TextView;
 import com.entboost.Log4jLog;
 import com.entboost.im.R;
 import com.entboost.im.global.MyApplication;
+import com.entboost.im.global.UIUtils;
 import com.entboost.ui.base.activity.AbActivity;
 import com.entboost.ui.base.activity.MyActivityManager;
 import com.entboost.ui.base.view.titlebar.AbTitleBar;
@@ -101,15 +101,15 @@ public class EbActivity extends AbActivity implements EntboostIMListenerInterfac
 	 * @return
 	 */
 	public static Dialog createLoadingDialog(Context context, String msg) {
-
 		LayoutInflater inflater = LayoutInflater.from(context);
 		View v = inflater.inflate(R.layout.loading_dialog, null);// 得到加载view
+		
 		LinearLayout layout = (LinearLayout) v.findViewById(R.id.dialog_view);// 加载布局
 		ImageView spaceshipImage = (ImageView) v.findViewById(R.id.img);
 		TextView tipTextView = (TextView) v.findViewById(R.id.tipTextView);// 提示文字
+		
 		// 加载动画
-		Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(
-				context, R.anim.loading_animation);
+		Animation hyperspaceJumpAnimation = AnimationUtils.loadAnimation(context, R.anim.loading_animation);
 		// 使用ImageView显示动画
 		spaceshipImage.startAnimation(hyperspaceJumpAnimation);
 		tipTextView.setText(msg);// 设置加载信息
@@ -121,7 +121,6 @@ public class EbActivity extends AbActivity implements EntboostIMListenerInterfac
 				LinearLayout.LayoutParams.FILL_PARENT,
 				LinearLayout.LayoutParams.FILL_PARENT));// 设置布局
 		return loadingDialog;
-
 	}
 
 	@Override
@@ -231,6 +230,84 @@ public class EbActivity extends AbActivity implements EntboostIMListenerInterfac
 	public void online_another() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void onAddMember(Long uid, Long empid, Long depCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onExitMember(Long uid, Long depCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUpdateMember(Long uid, Long empid, Long depCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUpdateGroup(Long depCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDeleteGroup(Long depCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onCall2Group(Long depCode, Long fromUid) {
+		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void onAddContactRequest(Long uid, String remark) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAddContactAccept(Long uid, Long contactId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onAddContactReject(Long uid, String remark) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDeleteContact(Long uid, Long contactId, boolean remove) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUpdateContact(Long uid, Long contactId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onUpdateContactGroup(Long contactGroupId,
+			String contactGroupName) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onDeleteContactGroup(Long contactGroupId) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

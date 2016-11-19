@@ -5,6 +5,7 @@
     android:orientation="vertical" >
 
     <LinearLayout
+        android:id="@+id/selected_area"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bottom_line1"
@@ -175,7 +176,7 @@
         android:cacheColorHint="#00000000"
         android:divider="@color/listdivider"
         android:dividerHeight="1px"
-        android:fastScrollEnabled="true"
+        android:fastScrollEnabled="false"
         android:groupIndicator="@null" >
     </ExpandableListView>
 
@@ -186,7 +187,7 @@
         android:cacheColorHint="#00000000"
         android:divider="@color/listdivider"
         android:dividerHeight="1px"
-        android:fastScrollEnabled="true"
+        android:fastScrollEnabled="false"
         android:groupIndicator="@null"
         android:visibility="gone" >
     </ExpandableListView>
@@ -198,7 +199,7 @@
         android:cacheColorHint="#00000000"
         android:divider="@color/listdivider"
         android:dividerHeight="1px"
-        android:fastScrollEnabled="true"
+        android:fastScrollEnabled="false"
         android:groupIndicator="@null"
         android:visibility="gone" >
     </ExpandableListView>
@@ -210,7 +211,7 @@
         android:cacheColorHint="#00000000"
         android:divider="@color/listdivider"
         android:dividerHeight="1px"
-        android:fastScrollEnabled="true"
+        android:fastScrollEnabled="false"
         android:groupIndicator="@null"
         android:visibility="gone" >
     </ExpandableListView>

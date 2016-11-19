@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.entboost.im.chat.ChatActivity;
@@ -30,33 +31,39 @@ public class SearchContactActivity extends EbActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_search_contact);
+		
 		ViewUtils.inject(this);
 		mListView = (ListView) findViewById(R.id.mListView);
-		adapter = new SearchContactAdapter(this, mInflater,
-				new Vector<SearchResultInfo>());
+		adapter = new SearchContactAdapter(this, mInflater, new Vector<SearchResultInfo>());
 		mListView.setAdapter(adapter);
+		
 		final EditText search = (EditText) findViewById(R.id.search);
 		search.setHint("搜索：用户、联系人");
 		ImageButton search_btn = (ImageButton) findViewById(R.id.search_btn);
 		search_btn.setOnClickListener(new View.OnClickListener() {
-
 			@Override
 			public void onClick(View arg0) {
 				pageInfo.showProgress("正在搜索用户、联系人");
-				EntboostCache.searchContact(adapter.getList(), search.getText()
-						.toString());
+				adapter.getList().clear();
+				adapter.getList().addAll(EntboostCache.searchContact(search.getText().toString()));
 				adapter.notifyDataSetChanged();
-				EntboostUM.searchMember(search.getText().toString(),
-						new SearchMemberListener() {
-
+				
+				EntboostUM.searchMember(search.getText().toString(), new SearchMemberListener() {
+					@Override
+					public void onFailure(final String errMsg) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
-							public void onFailure(String errMsg) {
+							public void run() {
 								pageInfo.showError(errMsg);
 							}
-
+						});
+					}
+					
+					@Override
+					public void onSearchMemberSuccess(final List<SearchResultInfo> sri) {
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
-							public void onSearchMemberSuccess(
-									List<SearchResultInfo> sri) {
+							public void run() {
 								pageInfo.hide();
 								if (sri != null) {
 									Vector<SearchResultInfo> temp = new Vector<SearchResultInfo>();
@@ -65,10 +72,12 @@ public class SearchContactActivity extends EbActivity {
 									adapter.notifyDataSetChanged();
 								}
 							}
-
 						});
+					}
+				});
 			}
 		});
+		
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -85,7 +94,5 @@ public class SearchContactActivity extends EbActivity {
 				}
 			}
 		});
-
 	}
-
 }

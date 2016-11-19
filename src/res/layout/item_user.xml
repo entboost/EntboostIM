@@ -24,7 +24,7 @@
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/user_select"
         android:scaleType="fitXY"
-        android:src="@drawable/entboost_logo" />
+        android:src="@drawable/default_user" />
 
     <TextView
         android:id="@+id/user_name"
@@ -35,7 +35,7 @@
         android:layout_toRightOf="@id/user_head"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="#194e62"
+        android:textColor="@color/text_color_2"
         android:textSize="16sp" />
 
     <TextView
@@ -48,7 +48,7 @@
         android:layout_toRightOf="@id/user_head"
         android:ellipsize="end"
         android:singleLine="true"
-        android:textColor="#60b1ce"
+        android:textColor="@color/text_color_gray"
         android:textSize="13sp" />
 
 </RelativeLayout>

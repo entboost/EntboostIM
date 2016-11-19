@@ -1,9 +1,11 @@
 package com.entboost.im.contact;
 
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import net.yunim.service.EntboostCache;
 import net.yunim.service.constants.EB_USER_LINE_STATE;
@@ -20,19 +22,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.entboost.im.R;
-import com.entboost.im.chat.ChatActivity;
 import com.entboost.ui.utils.AbImageUtil;
 
 public class ContactAdapter extends BaseExpandableListAdapter {
-	private Map<Long, Vector<ContactInfo>> mList = new HashMap<Long, Vector<ContactInfo>>();
-	private Vector<ContactGroup> grouplist = new Vector<ContactGroup>();
+	private Map<Long, List<ContactInfo>> mList = new HashMap<Long, List<ContactInfo>>();
+	private List<ContactGroup> grouplist = new ArrayList<ContactGroup>();
 	private Context mContext;
-	private boolean selectMember;
+	private boolean selectMember; //是否选择人员视图
+	private boolean selectOne = false; //是否单选
+	
+	private ExpandableListView listView;
 
 	public Context getmContext() {
 		return mContext;
@@ -41,31 +46,43 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 	public void setSelectMember(boolean selectMember) {
 		this.selectMember = selectMember;
 	}
+	
+	public void setSelectOne(boolean selectOne) {
+		this.selectOne = selectOne;
+	}
 
-	public void initFriendList(Vector<ContactGroup> grouplist,
-			Vector<ContactInfo> contactInfos) {
+	public void initFriendList(List<ContactGroup> grouplist, List<ContactInfo> contactInfos) {
 		this.grouplist.clear();
 		mList.clear();
+		
+		//排序
 		Collections.sort(contactInfos);
 		Collections.sort(grouplist);
+		
+		//未分组
 		ContactGroup nogroup = new ContactGroup();
 		nogroup.setGroupname("未分组");
 		this.grouplist.add(nogroup);
+		//其它分组
 		this.grouplist.addAll(grouplist);
-		mList.put(0l, new Vector<ContactInfo>());
+		
+		//初始化各分组列表
+		mList.put(0L, new ArrayList<ContactInfo>());
 		for (ContactGroup cg : grouplist) {
-			mList.put(cg.getUgid(), new Vector<ContactInfo>());
+			mList.put(cg.getUgid(), new ArrayList<ContactInfo>());
 		}
+		
+		//联系人依次填入各分组
 		for (ContactInfo gi : contactInfos) {
-			Vector<ContactInfo> clist = mList.get(gi.getUgid());
-			if (clist != null) {
+			List<ContactInfo> clist = mList.get(gi.getUgid());
+			if (clist != null)
 				clist.add(gi);
-			}
 		}
 	}
 
-	public ContactAdapter(Context context) {
+	public ContactAdapter(Context context, ExpandableListView listView) {
 		mContext = context;
+		this.listView = listView;
 	}
 
 	/**
@@ -86,7 +103,7 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 
 	@Override
 	public Object getChild(int groupPosition, int childPosition) {
-		Vector<ContactInfo> childs = mList.get(getGroupId(groupPosition));
+		List<ContactInfo> childs = mList.get(getGroupId(groupPosition));
 		if (childs == null) {
 			return null;
 		}
@@ -99,39 +116,34 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public View getChildView(int groupPosition, int childPosition,
-			boolean isLastChild, View convertView, ViewGroup parent) {
+	public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 		ItemViewHolder holder2 = null;
-		if (convertView == null
-				|| convertView.getTag() instanceof GroupViewHolder) {
+		if (convertView == null || convertView.getTag() instanceof GroupViewHolder) {
 			// 使用自定义的list_items作为Layout
-			convertView = LayoutInflater.from(mContext).inflate(
-					R.layout.item_user, parent, false);
+			convertView = LayoutInflater.from(mContext).inflate(R.layout.item_user, parent, false);
 			holder2 = new ItemViewHolder();
 			// 初始化布局中的元素
-			holder2.userImg = ((ImageView) convertView
-					.findViewById(R.id.user_head));
-			holder2.userName = ((TextView) convertView
-					.findViewById(R.id.user_name));
-			holder2.description = ((TextView) convertView
-					.findViewById(R.id.user_description));
-			holder2.user_select = ((ImageButton) convertView
-					.findViewById(R.id.user_select));
+			holder2.userImg = ((ImageView) convertView.findViewById(R.id.user_head));
+			holder2.userName = ((TextView) convertView.findViewById(R.id.user_name));
+			holder2.description = ((TextView) convertView.findViewById(R.id.user_description));
+			holder2.user_select = ((ImageButton) convertView.findViewById(R.id.user_select));
 			convertView.setTag(holder2);
 		} else {
 			holder2 = (ItemViewHolder) convertView.getTag();
 		}
-		if (selectMember) {
+		
+		if (selectMember && !selectOne) {
 			holder2.user_select.setVisibility(View.VISIBLE);
 		}
-		final ContactInfo mi = (ContactInfo) getChild(groupPosition,
-				childPosition);
+		
+		final ContactInfo mi = (ContactInfo) getChild(groupPosition, childPosition);
 		String name = null;
 		if (StringUtils.isNotBlank(mi.getName())) {
 			name = mi.getName();
 		} else {
 			name = mi.getContact();
 		}
+		
 		holder2.userName.setText(name);
 		String type = "";
 		if (mi.getCon_uid() == null) {
@@ -139,41 +151,35 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 			if (selectMember) {
 				holder2.user_select.setVisibility(View.INVISIBLE);
 			}
-			holder2.userImg.setImageBitmap(AbImageUtil.grey(BitmapFactory
-					.decodeResource(mContext.getResources(),
-							R.drawable.entboost_logo)));
+			holder2.userImg.setImageBitmap(AbImageUtil.grey(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_user)));
 		} else {
 			AppAccountInfo appInfo = EntboostCache.getAppInfo();
-			if (mi.getType() == 0
-					&& (appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) == AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
+			if (mi.getType() == 0 && (appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) == AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
 				type = "[系统用户-未验证]";
 			} else {
 				type = "[系统用户]";
 			}
-			if (mi.getState() <= EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE
-					.getValue()) {
-				holder2.userImg.setImageBitmap(AbImageUtil.grey(BitmapFactory
-						.decodeResource(mContext.getResources(),
-								R.drawable.entboost_logo)));
+			if (mi.getState() <= EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE.getValue()) {
+				holder2.userImg.setImageBitmap(AbImageUtil.grey(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_user)));
 			} else {
-				holder2.userImg.setImageResource(R.drawable.entboost_logo);
+				holder2.userImg.setImageResource(R.drawable.default_user);
 			}
-			holder2.userImg.setOnClickListener(new View.OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(mContext,
-							ContactInfoActivity.class);
-					if (mi != null) {
-						intent.putExtra("con_id", mi.getCon_id());
-						mContext.startActivity(intent);
-					}
-				}
-			});
 		}
+		
+		holder2.userImg.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(mContext, ContactInfoActivity.class);
+				if (mi != null) {
+					intent.putExtra("con_id", mi.getCon_id());
+					mContext.startActivity(intent);
+				}
+			}
+		});
+		
 		AppAccountInfo appInfo = EntboostCache.getAppInfo();
 		if ((appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) != AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
-			holder2.userImg.setImageResource(R.drawable.entboost_logo);
+			holder2.userImg.setImageResource(R.drawable.default_user);
 		}
 		holder2.description.setText(type + mi.getDescription());
 		return convertView;
@@ -184,7 +190,7 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 		if (groupPosition >= mList.size()) {
 			return 0;
 		}
-		Vector<ContactInfo> childrens = mList.get(getGroupId(groupPosition));
+		List<ContactInfo> childrens = mList.get(getGroupId(groupPosition));
 		if (childrens == null) {
 			return 0;
 		}
@@ -207,33 +213,30 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 	}
 
 	@Override
-	public View getGroupView(int groupPosition, boolean isExpanded,
-			View convertView, ViewGroup parent) {
+	public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
 		final ContactGroup group = grouplist.get(groupPosition);
 		GroupViewHolder holder1;
-		if (convertView == null
-				|| convertView.getTag() instanceof ItemViewHolder) {
+		if (convertView == null || convertView.getTag() instanceof ItemViewHolder) {
 			// 使用自定义的list_items作为Layout
-			convertView = LayoutInflater.from(mContext).inflate(
-					R.layout.item_contact_group, parent, false);
+			convertView = LayoutInflater.from(mContext).inflate(R.layout.item_contact_group, parent, false);
+			
 			// 减少findView的次数
 			holder1 = new GroupViewHolder();
 			// 初始化布局中的元素
-			holder1.itemsHead = ((ImageView) convertView
-					.findViewById(R.id.item_contact_group_head));
-			holder1.itemsText = ((TextView) convertView
-					.findViewById(R.id.item_contact_group_name));
-			holder1.itemsInfo = ((ImageView) convertView
-					.findViewById(R.id.item_group_info));
+			holder1.itemsHead = ((ImageView) convertView.findViewById(R.id.item_contact_group_head));
+			holder1.itemsText = ((TextView) convertView.findViewById(R.id.item_contact_group_name));
+			holder1.itemsInfo = ((ImageView) convertView.findViewById(R.id.item_group_info));
 			convertView.setTag(holder1);
 		} else {
 			holder1 = (GroupViewHolder) convertView.getTag();
 		}
+		
 		if (isExpanded) {
-			holder1.itemsHead.setImageResource(R.drawable.ui67new);
+			holder1.itemsHead.setImageResource(R.drawable.tree_opened);
 		} else {
-			holder1.itemsHead.setImageResource(R.drawable.ui66new);
+			holder1.itemsHead.setImageResource(R.drawable.tree_closed);
 		}
+		
 		if (group != null) {
 			int size = 0;
 			int onlineSize = 0;
@@ -259,15 +262,14 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 				holder1.itemsText.setText(group.getGroupname());
 			}
 		}
-		if (group.getUgid() == 0) {
+		
+		if (group.getUgid() == 0 || selectMember) {
 			holder1.itemsInfo.setVisibility(View.GONE);
 		} else {
 			holder1.itemsInfo.setOnClickListener(new View.OnClickListener() {
-
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(mContext,
-							ContactGroupActivity.class);
+					Intent intent = new Intent(mContext, ContactGroupActivity.class);
 					intent.putExtra("contactgroup", group);
 					mContext.startActivity(intent);
 				}

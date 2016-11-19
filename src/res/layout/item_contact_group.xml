@@ -12,7 +12,7 @@
         android:layout_height="20dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/ui66new" />
+        android:src="@drawable/tree_closed" />
 
     <TextView
         android:id="@+id/item_contact_group_name"
@@ -21,7 +21,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@id/item_contact_group_head"
-        android:textColor="#194e62"
+        android:textColor="@color/text_color_2"
         android:textSize="16sp" />
     
     <ImageView

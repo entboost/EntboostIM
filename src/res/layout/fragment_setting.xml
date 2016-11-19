@@ -27,7 +27,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/entboost_logo" />
+                android:src="@drawable/default_user" />
 
             <TextView
                 android:id="@+id/user_name"
@@ -37,7 +37,7 @@
                 android:layout_marginLeft="17dp"
                 android:layout_toRightOf="@+id/user_head"
                 android:singleLine="true"
-                android:textColor="#194e62"
+                android:textColor="@color/text_color_2"
                 android:textSize="16sp" />
         </RelativeLayout>
 
@@ -67,7 +67,7 @@
                 android:layout_toRightOf="@+id/msg_img"
                 android:singleLine="true"
                 android:text="检查新版本"
-                android:textColor="#194e62"
+                android:textColor="@color/text_color_2"
                 android:textSize="16sp" />
         </RelativeLayout>
         
@@ -97,7 +97,7 @@
                 android:layout_toRightOf="@+id/s_img"
                 android:singleLine="true"
                 android:text="隐私与安全"
-                android:textColor="#194e62"
+                android:textColor="@color/text_color_2"
                 android:textSize="16sp" />
         </RelativeLayout>
         
@@ -127,7 +127,7 @@
                 android:layout_toRightOf="@+id/chat_img"
                 android:singleLine="true"
                 android:text="聊天对话"
-                android:textColor="#194e62"
+                android:textColor="@color/text_color_2"
                 android:textSize="16sp" />
         </RelativeLayout>
         
@@ -157,7 +157,7 @@
                 android:layout_toRightOf="@+id/logout_img"
                 android:singleLine="true"
                 android:text="退出登录"
-                android:textColor="#194e62"
+                android:textColor="@color/text_color_2"
                 android:textSize="16sp" />
         </RelativeLayout>
 

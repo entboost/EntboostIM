@@ -19,21 +19,18 @@ public class FunctionListFragment extends EbFragment {
 	private ListView mAbPullListView;
 	private FunctionAdapter functionAdapter;
 
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View view = onCreateEbView(R.layout.fragment_function, inflater,
-				container);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = onCreateEbView(R.layout.fragment_function, inflater, container);
 		mAbPullListView = (ListView) view.findViewById(R.id.mListView);
+		
 		functionAdapter = new FunctionAdapter(view.getContext(), EntboostCache.getFuncInfos());
 		mAbPullListView.setAdapter(functionAdapter);
+		
 		mAbPullListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				FuncInfo funcInfo = (FuncInfo) functionAdapter
-						.getItem(position);
-				Intent intent = new Intent(FunctionListFragment.this
-						.getActivity(), FunctionMainActivity.class);
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				FuncInfo funcInfo = (FuncInfo) functionAdapter.getItem(position);
+				Intent intent = new Intent(FunctionListFragment.this.getActivity(), FunctionMainActivity.class);
 				intent.putExtra("funcInfo", funcInfo);
 				startActivity(intent);
 			}
@@ -42,12 +39,11 @@ public class FunctionListFragment extends EbFragment {
 	}
 
 	@Override
-	public void refreshPage() {
-		super.refreshPage();
+	public void refreshPage(boolean switchView) {
+		super.refreshPage(switchView);
 		if(functionAdapter!=null){
 			functionAdapter.setList(EntboostCache.getFuncInfos());
 			functionAdapter.notifyDataSetChanged();
 		}
 	}
-
 }

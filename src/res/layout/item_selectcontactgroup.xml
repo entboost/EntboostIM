@@ -23,7 +23,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:scaleType="fitXY"
-        android:src="@drawable/group_head" />
+        android:src="@drawable/group_head_0" />
 
     <TextView
         android:id="@+id/user_name"
@@ -32,7 +32,7 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/user_head"
         android:layout_marginLeft="10dp"
-        android:textColor="#194e62"
+        android:textColor="@color/text_color_2"
         android:textSize="18sp" />
 
 </RelativeLayout>
