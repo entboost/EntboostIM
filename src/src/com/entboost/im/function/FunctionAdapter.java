@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 import net.yunim.service.entity.FuncInfo;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -71,17 +71,17 @@ public class FunctionAdapter extends BaseAdapter {
 		// 获取该行的数据
 		FuncInfo funcInfo = (FuncInfo) getItem(position);
 		holder.itemsTitle.setText(funcInfo.getFunc_name());
-		if (StringUtils.isNotBlank(funcInfo.getIcon_res_id())) {
-			Bitmap img = ResourceUtils.getHeadBitmap(Long.valueOf(funcInfo.getIcon_res_id()));
+		if (funcInfo.getIcon_res_id()>0) { //StringUtils.isNotBlank(funcInfo.getIcon_res_id())
+			Bitmap img = YIResourceUtils.getHeadBitmap(Long.valueOf(funcInfo.getIcon_res_id()));
 			if (img != null) {
 				holder.itemsIcon.setImageBitmap(img);
 			} else {
 				//设置几个内置应用的图标
-				if (funcInfo.getSub_id().equals("1002300102")) {
+				if (funcInfo.getSub_id()==1002300102) {
 					holder.itemsIcon.setImageResource(R.drawable.subid_1002300102);
-				} else if (funcInfo.getSub_id().equals("1002300103")) {
+				} else if (funcInfo.getSub_id()==1002300103) {
 					holder.itemsIcon.setImageResource(R.drawable.message_head);
-				} else if (funcInfo.getSub_id().equals("1002300104")) {
+				} else if (funcInfo.getSub_id()==1002300104) {
 					holder.itemsIcon.setImageResource(R.drawable.subid_1002300104);
 				} else 
 					ImageLoader.getInstance().displayImage(funcInfo.getIconUrl(), holder.itemsIcon, MyApplication.getInstance().getFuncInfoImgOptions());

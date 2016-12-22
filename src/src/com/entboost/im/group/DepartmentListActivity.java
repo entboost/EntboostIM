@@ -35,7 +35,7 @@ public class DepartmentListActivity extends EbActivity {
 	private DepAndMemberAdapter adapter;
 	private boolean selecteduser; //是否选择人员视图
 	private boolean selectOne = false; //是否单选
-	//除外的用户编号列表(不允许选中这些编号，暂时仅对单选视图有效)
+	//除外的用户编号列表(不允许选中这些编号)
 	private List<Long> excludeUids = new ArrayList<Long>();
 	
 	@Override
@@ -57,7 +57,9 @@ public class DepartmentListActivity extends EbActivity {
 			AbTitleBar titleBar = this.getTitleBar();
 			titleBar.setTitleText(departmentInfo.getDep_name());
 			listView = (ListView) findViewById(R.id.deplist);
+			
 			adapter = new DepAndMemberAdapter(this);
+			adapter.setExcludeUids(excludeUids);
 			adapter.setSelectMember(selecteduser);
 			if (selectOne)
 				adapter.setSelectOne(selectOne);
@@ -65,7 +67,7 @@ public class DepartmentListActivity extends EbActivity {
 			showProgressDialog("正在加载下级群组和成员信息！");
 			EntboostUM.loadMembers(departmentInfo.getDep_code(), new LoadAllMemberListener() {
 				@Override
-				public void onFailure(String errMsg) {
+				public void onFailure(int code, String errMsg) {
 					HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 						@Override
 						public void run() {
@@ -109,23 +111,6 @@ public class DepartmentListActivity extends EbActivity {
 								startActivity(intent);
 							}
 						} else if (obj instanceof DepartmentInfo) {
-//							DepartmentInfo group = (DepartmentInfo) obj;
-//							if (group.getMy_emp_id() == null || group.getMy_emp_id() <= 0) {
-//								showToast("您不是该部门成员，不允许发起会话！");
-//							}else{
-//								Intent intent = new Intent(DepartmentListActivity.this, ChatActivity.class);
-//								intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-//										| Intent.FLAG_ACTIVITY_SINGLE_TOP
-//										| Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//								intent.putExtra(ChatActivity.INTENT_TITLE,
-//										group.getDep_name());
-//								intent.putExtra(ChatActivity.INTENT_UID,
-//										group.getDep_code());
-//								intent.putExtra(ChatActivity.INTENT_CHATTYPE,
-//										ChatActivity.CHATTYPE_GROUP);
-//								startActivity(intent);
-//							}
-							//finish();
 							DepartmentInfo departmentInfo = (DepartmentInfo) obj;
 							Intent intent = new Intent(DepartmentListActivity.this, DepartmentListActivity.class);
 							intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
@@ -147,7 +132,7 @@ public class DepartmentListActivity extends EbActivity {
 							MemberInfo memberInfo = (MemberInfo) obj;
 							if (!selectOne) { //多选视图
 								ImageView selectImg = (ImageView) view.findViewById(R.id.user_select);
-								if (selectImg.getVisibility() == View.GONE) {
+								if (selectImg.getVisibility() == View.GONE || selectImg.getVisibility() == View.INVISIBLE) {
 									return;
 								}
 								

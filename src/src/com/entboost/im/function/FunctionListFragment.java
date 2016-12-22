@@ -23,7 +23,7 @@ public class FunctionListFragment extends EbFragment {
 		View view = onCreateEbView(R.layout.fragment_function, inflater, container);
 		mAbPullListView = (ListView) view.findViewById(R.id.mListView);
 		
-		functionAdapter = new FunctionAdapter(view.getContext(), EntboostCache.getFuncInfos());
+		functionAdapter = new FunctionAdapter(view.getContext(), EntboostCache.getCommonFuncInfos());
 		mAbPullListView.setAdapter(functionAdapter);
 		
 		mAbPullListView.setOnItemClickListener(new OnItemClickListener() {
@@ -42,7 +42,7 @@ public class FunctionListFragment extends EbFragment {
 	public void refreshPage(boolean switchView) {
 		super.refreshPage(switchView);
 		if(functionAdapter!=null){
-			functionAdapter.setList(EntboostCache.getFuncInfos());
+			functionAdapter.setList(EntboostCache.getCommonFuncInfos());
 			functionAdapter.notifyDataSetChanged();
 		}
 	}

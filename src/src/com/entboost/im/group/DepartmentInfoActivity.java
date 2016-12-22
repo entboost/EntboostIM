@@ -1,12 +1,15 @@
 package com.entboost.im.group;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.yunim.service.EntboostCache;
 import net.yunim.service.EntboostUM;
-import net.yunim.service.constants.EB_MANAGER_LEVEL;
 import net.yunim.service.entity.DepartmentInfo;
 import net.yunim.service.entity.MemberInfo;
 import net.yunim.service.listener.DelGroupListener;
-import net.yunim.service.listener.LoadMemberListener;
+import net.yunim.service.listener.LoadAllMemberListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,8 +25,6 @@ import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.entboost.im.chat.ChatActivity;
-import com.entboost.im.global.MyApplication;
-import com.entboost.im.group.MemberSelectActivity;
 import com.lidroid.xutils.ViewUtils;
 import com.lidroid.xutils.view.annotation.event.OnClick;
 
@@ -85,33 +86,37 @@ public class DepartmentInfoActivity extends EbActivity {
 			addr.setText(departmentInfo.getAddress());
 			name.setText(departmentInfo.getDep_name());
 			description.setText(departmentInfo.getDescription());
+			
 			// 当前登录用户不在该群组时，不能进行群组会话
 			if (departmentInfo.getMy_emp_id() == null || departmentInfo.getMy_emp_id() <= 0) {
 				send_btn.setVisibility(View.GONE);
-			} else {
-				EntboostUM.loadMemberByCode(departmentInfo.getMy_emp_id(), new LoadMemberListener() {
-					@Override
-					public void onFailure(String errMsg) {
-					}
-					
-					@Override
-					public void onLoadMemberSuccess(final MemberInfo member) {
-						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
-							@Override
-							public void run() {
-								if(member==null){
-									showToast("加载成员权限信息失败！");
-									return;
-								}
-								if ((member.getManager_level() & EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN.getValue()) == EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN.getValue()) {
-									department_usermanager.setVisibility(View.VISIBLE);
-									department_del_btn.setVisibility(View.VISIBLE);
-								}
-							}
-						});
-					}
-				});
 			}
+//			else {
+//				if (departmentInfo.getMy_emp_id()>0) {
+//					EntboostUM.loadMembers(depid, new LoadAllMemberListener() {
+//						@Override
+//						public void onFailure(int code, String errMsg) {
+//						}
+//						
+//						@Override
+//						public void onLoadAllMemberSuccess() {
+//							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+//								@Override
+//								public void run() {
+//									MemberInfo member = EntboostCache.getMemberByCode(departmentInfo.getMy_emp_id());
+//									if (member!=null) {
+//										if ((member.getManager_level() & EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN.getValue()) == EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN.getValue()) {
+//											department_usermanager.setVisibility(View.VISIBLE);
+//											department_del_btn.setVisibility(View.VISIBLE);
+//										}
+//									}
+//								}
+//							});
+//						}
+//					});
+//				}
+//			}
+			
 			// 确认部门的管理员权限
 			if (departmentInfo.getCreate_uid() - EntboostCache.getUid() == 0
 					|| EntboostCache.getEnterpriseInfo().getCreate_uid()
@@ -122,6 +127,7 @@ public class DepartmentInfoActivity extends EbActivity {
 			if (isManager) {
 				ImageView department_name_arrow = (ImageView) findViewById(R.id.department_name_arrow);
 				department_name_arrow.setVisibility(View.VISIBLE);
+				
 				Drawable drawable = getResources().getDrawable(R.drawable.a4040);
 				drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
 				tel.setCompoundDrawables(null, null, drawable, null);
@@ -135,9 +141,34 @@ public class DepartmentInfoActivity extends EbActivity {
 
 	@OnClick(R.id.department_usermanager)
 	public void usermanager(View view) {
-		Intent intent = new Intent(this, MemberSelectActivity.class);
-		intent.putExtra("groupid", depid);
-		startActivity(intent);
+		//加载该群组的所有成员
+		EntboostUM.loadMembers(depid, new LoadAllMemberListener() {
+			@Override
+			public void onFailure(int code, String errMsg) {
+			}
+			
+			@Override
+			public void onLoadAllMemberSuccess() {
+				//在主线程执行
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						Intent intent = new Intent(DepartmentInfoActivity.this, MemberSelectActivity.class);
+						intent.putExtra("groupid", depid);
+						
+						List<MemberInfo> memberInfos = EntboostCache.getGroupMemberInfos(depid);
+						//把当前已在群组内的用户除外
+						List<Long> excludeUids = new ArrayList<Long>();
+						for (MemberInfo mi : memberInfos) {
+							excludeUids.add(mi.getEmp_uid());
+						}
+						intent.putExtra("excludeUids", (Serializable)excludeUids);
+						
+						startActivity(intent);
+					}
+				});
+			}
+		});
 	}
 
 	@OnClick(R.id.department_del_btn)
@@ -149,7 +180,7 @@ public class DepartmentInfoActivity extends EbActivity {
 				if (departmentInfo != null) {
 					EntboostUM.delDepartment(departmentInfo.getDep_code(), new DelGroupListener() {
 								@Override
-								public void onFailure(final String errMsg) {
+								public void onFailure(int code, final String errMsg) {
 									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
 										public void run() {

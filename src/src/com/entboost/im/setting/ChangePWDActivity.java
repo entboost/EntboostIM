@@ -55,7 +55,7 @@ public class ChangePWDActivity extends EbActivity {
 		showProgressDialog("修改用户密码");
 		EntboostUM.changePassword(changepwd_passwd_str, changepwd_oldpasswd_str, new EditInfoListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

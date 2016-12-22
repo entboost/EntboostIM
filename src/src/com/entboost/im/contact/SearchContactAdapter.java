@@ -8,7 +8,7 @@ import net.yunim.service.entity.ContactInfo;
 import net.yunim.service.entity.GroupInfo;
 import net.yunim.service.entity.MemberInfo;
 import net.yunim.service.entity.SearchResultInfo;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -85,7 +85,7 @@ public class SearchContactAdapter extends BaseAdapter {
 			holder.description.setText(obj.getSrc());
 			if (obj.getType() == SearchResultInfo.TYPE_USERCHAT) {
 				MemberInfo memberInfo = (MemberInfo) obj.getObj();
-				Bitmap img = ResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
+				Bitmap img = YIResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
 				if (img != null) {
 					holder.userImg.setImageBitmap(img);
 				} else {
@@ -104,7 +104,8 @@ public class SearchContactAdapter extends BaseAdapter {
 					} else if (obj.getType() == SearchResultInfo.TYPE_CONTACTCHAT) {
 						ContactInfo contactInfo = (ContactInfo) obj.getObj();
 						Intent intent = new Intent(mContext, ContactInfoActivity.class);
-						intent.putExtra("contact", contactInfo.getContact());
+						intent.putExtra("con_id", contactInfo.getCon_id());
+						//intent.putExtra("contact", contactInfo.getContact());
 						mContext.startActivity(intent);
 					} else if (obj.getType() == SearchResultInfo.TYPE_USERCHAT) {
 						MemberInfo memberInfo = (MemberInfo) obj.getObj();

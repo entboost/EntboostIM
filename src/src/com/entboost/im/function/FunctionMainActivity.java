@@ -1,8 +1,9 @@
 package com.entboost.im.function;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Vector;
+import java.util.Map.Entry;
 
 import net.yunim.service.EntboostUM;
 import net.yunim.service.entity.CardInfo;
@@ -27,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.entboost.Log4jLog;
 import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
@@ -37,6 +39,8 @@ import com.entboost.ui.base.view.titlebar.AbTitleBar;
 @SuppressLint("SetJavaScriptEnabled")
 public class FunctionMainActivity extends EbActivity {
 
+	private static String LONG_TAG = FunctionMainActivity.class.getName();
+	
 	private WebView mWebView;
 	private FuncInfo funcInfo;
 
@@ -47,17 +51,29 @@ public class FunctionMainActivity extends EbActivity {
 		
 		funcInfo = (FuncInfo) getIntent().getSerializableExtra("funcInfo");
 		String tab_type = getIntent().getStringExtra("tab_type");
+		HashMap<String, Object> eParams = (HashMap<String, Object>)getIntent().getSerializableExtra("eParams");
+		
 		AbTitleBar titleBar = this.getTitleBar();
 		titleBar.setTitleText(funcInfo.getFunc_name());
+		
 		mWebView = (WebView) findViewById(R.id.funcWebView);
 		WebSettings s = mWebView.getSettings();
+		//支持JS
 		s.setJavaScriptEnabled(true);
+		//设置WebView可触摸放大缩小
+		s.setSupportZoom(true);
+		s.setBuiltInZoomControls(true);
+		s.setDisplayZoomControls(false);
+		//支持缓存
 		s.setDomStorageEnabled(true);
+		
+		//加载页面自适应手机屏幕 
+	    s.setUseWideViewPort(true);
+	    s.setLoadWithOverviewMode(true);
+		
 		mWebView.setBackgroundResource(R.color.mainPageBG);
 		mWebView.requestFocus();
 		mWebView.setScrollBarStyle(0);
-		//设置WebView可触摸放大缩小
-		mWebView.getSettings().setBuiltInZoomControls(true);
 		
 		//加载页面
 		mWebView.setWebViewClient(new WebViewClient() {
@@ -138,6 +154,17 @@ public class FunctionMainActivity extends EbActivity {
 					}
 
 					@Override
+					public void download_resource(int type, long resId) {
+						//关闭界面并返回下载资源文件的选择结果
+						Intent intent = getIntent();
+						intent.putExtra("resId", resId);
+						intent.putExtra("dlType", type);
+						
+						setResult(RESULT_OK, intent);
+						FunctionMainActivity.this.finish();
+					}
+
+					@Override
 					public void defaultLink() {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
@@ -148,7 +175,7 @@ public class FunctionMainActivity extends EbActivity {
 					}
 
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {
@@ -162,13 +189,20 @@ public class FunctionMainActivity extends EbActivity {
 				return true;
 			}
 		});
+		
 		String url = funcInfo.getFunc_url(tab_type);
+		if (eParams!=null && eParams.size()>0) {
+			for (Entry<String, Object> entry : eParams.entrySet()) {
+				url = url + "&" + entry.getKey() + "=" + entry.getValue();
+			}
+		}
+		Log4jLog.i(LONG_TAG, url);
 		mWebView.loadUrl(url);
 		
 		//导航菜单
 		EntboostUM.loadFnav(Long.valueOf(funcInfo.getSub_id()), new LoadFnavListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

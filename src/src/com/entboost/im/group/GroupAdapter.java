@@ -3,6 +3,7 @@ package com.entboost.im.group;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +17,7 @@ import net.yunim.service.entity.GroupInfo;
 import net.yunim.service.entity.MemberInfo;
 import net.yunim.service.entity.PersonGroupInfo;
 import net.yunim.service.listener.LoadAllMemberListener;
+import net.yunim.utils.YIResourceUtils;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -54,8 +56,11 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 	private Context mContext;
 	private Map<Long, List<Comparable>> localGroupMemberInfos = new HashMap<Long, List<Comparable>>();
 	private List<T> groups = new ArrayList<T>();
+	
 	private boolean selectMember; //是否选择人员视图
 	private boolean selectOne = false; //是否单选
+	//除外的用户编号列表(不允许选中这些编号)
+	private List<Long> excludeUids = new ArrayList<Long>();
 	
 	private ExpandableListView listView;
 	//选中成员事件监听器
@@ -63,6 +68,13 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 	
 	//暂记录正在加载信息的群组
 	private Map<Long, Boolean> groupLoadings = new ConcurrentHashMap<Long, Boolean>();
+	
+	//是否统计子部门成员的人数
+	private boolean calculateSubDepartment;
+	
+	public void setCalculateSubDepartment(boolean calculateSubDepartment) {
+		this.calculateSubDepartment = calculateSubDepartment;
+	}
 
 	public void setSelectedMemberListener(SelectedMemberListener selectedMemberListener) {
 		this.selectedMemberListener = selectedMemberListener;
@@ -70,6 +82,10 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 	
 	public void setSelectOne(boolean selectOne) {
 		this.selectOne = selectOne;
+	}
+	
+	public void setExcludeUids(List<Long> excludeUids) {
+		this.excludeUids = excludeUids;
 	}
 
 	/**
@@ -125,6 +141,22 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 		super.notifyDataSetChanged();
 	}
 
+	//删除作为叶子的部门节点
+	public void removeDepartmentInfoLeafNode(Long groupid) {
+		for (List<Comparable> list: localGroupMemberInfos.values()) {
+			Iterator<Comparable> it = list.iterator();
+			while(it.hasNext()) {
+				Object obj = it.next();
+				if (obj instanceof DepartmentInfo) {
+					DepartmentInfo depInfo = (DepartmentInfo)obj;
+					if (depInfo.getDep_code()-groupid ==0) {
+						it.remove();
+					}
+				}
+			}
+		}
+	}
+	
 	public void setMembers(Long groupid, boolean hasNextGroup) {
 		this.localGroupMemberInfos.remove(groupid);
 		List<Comparable> temp = new ArrayList<Comparable>();
@@ -137,6 +169,7 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 			}
 		}
 		
+		//获取该部门下成员
 		List<MemberInfo> gis = EntboostCache.getGroupMemberInfos(groupid);
 		if (gis != null) {
 			temp.addAll(gis);
@@ -181,23 +214,25 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 			}
 			
 			final MemberInfo memberInfo = (MemberInfo) obj;
-			//处理点击头像事件
-			holder1.userImg.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(mContext, MemberInfoActivity.class);
-					if (memberInfo != null) {
-						intent.putExtra("memberCode", memberInfo.getEmp_code());
-						if (memberInfo.getEmp_uid() - EntboostCache.getUid() == 0) {
-							intent.putExtra("selfFlag", true);
+			//处理点击头像事件；选择视图不允许点击
+			if (!selectMember) {
+				holder1.userImg.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						Intent intent = new Intent(mContext, MemberInfoActivity.class);
+						if (memberInfo != null) {
+							intent.putExtra("memberCode", memberInfo.getEmp_code());
+							if (memberInfo.getEmp_uid() - EntboostCache.getUid() == 0) {
+								intent.putExtra("selfFlag", true);
+							}
+							mContext.startActivity(intent);
 						}
-						mContext.startActivity(intent);
 					}
-				}
-			});
+				});
+			}
 			
 			//设置头像
-			Bitmap img = net.yunim.utils.ResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
+			Bitmap img = YIResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
 			if (img != null) {
 				if (memberInfo.getState() <= EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE.getValue()) {
 					holder1.userImg.setImageBitmap(AbImageUtil.grey(img));
@@ -242,21 +277,21 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 			holder1.description.setText(memberInfo.getDescription());
 			
 			//在选择视图
-			if (selectMember && !selectOne) {
+			if (selectMember) {
 				holder1.user_select.setVisibility(View.VISIBLE);
-				if (memberInfo.getEmp_uid() - EntboostCache.getUid() == 0) {
+				
+				if (selectOne || excludeUids.contains(memberInfo.getEmp_uid())/*|| memberInfo.getEmp_uid() - EntboostCache.getUid() == 0*/) {
 					holder1.user_select.setVisibility(View.INVISIBLE);
-				} else {
-					if (MemberSelectActivity.isMemberSelected(memberInfo))
-						holder1.user_select.setImageResource(R.drawable.uitb_57);
 				}
+				
+				if (MemberSelectActivity.isMemberSelected(memberInfo))
+					holder1.user_select.setImageResource(R.drawable.uitb_57);
 			}
 			
 			// 修改名称颜色
 			if (memberInfo.isCreator()
 					|| (memberInfo.getManager_level() & EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN
-							.getValue()) == EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN
-							.getValue()) {
+							.getValue()) == EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN.getValue()) {
 				holder1.itemsText.setTextColor(Color.rgb(255, 0, 96));
 			}else if (memberInfo.getEmp_uid() - EntboostCache.getUid() == 0) {
 				holder1.itemsText.setTextColor(Color.BLUE);
@@ -286,7 +321,8 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 			final DepartmentInfo group = (DepartmentInfo) obj;
 			holder2.itemsHead.setVisibility(View.VISIBLE);
 			holder2.itemsProgress.setVisibility(View.GONE);
-			holder2.itemsText.setText(group.getDep_name() + group.getEmp_online_state());
+			//名称+人数
+			holder2.itemsText.setText(group.getDep_name() + createFormatedStrOfGroupCount(group));
 			
 			//最右边的按钮布局
 			RelativeLayout.LayoutParams layoutParams= new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT); 
@@ -366,7 +402,7 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 							UIUtils.showProgressDialog(mContext, "请稍后...");
 							EntboostUM.loadMembers(depCode, new LoadAllMemberListener() {
 								@Override
-								public void onFailure(final String errMsg) {
+								public void onFailure(int code, final String errMsg) {
 									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
 										public void run() {
@@ -383,8 +419,14 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 										public void run() {
 											List<MemberInfo> memberInfos = EntboostCache.getGroupMemberInfos(depCode);
 											if (memberInfos != null) {
-												MemberSelectActivity.addSelectedMembers(depCode, memberInfos);
 												MemberSelectActivity.addSelectedGroup(group);
+												//MemberSelectActivity.addSelectedMembers(depCode, memberInfos);
+												
+												//去除被过滤的用户
+												for (MemberInfo mi : memberInfos) {
+													if (!excludeUids.contains(mi.getEmp_uid()))
+														MemberSelectActivity.addSelectedMember(mi);
+												}
 												
 												//触发变更回调事件
 												if (selectedMemberListener!=null)
@@ -491,6 +533,20 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 		return -1;
 	}
 
+	//名称+成员在线人数和成员人数
+	private String createFormatedStrOfGroupCount(GroupInfo group) {
+		//名称+成员在线人数和成员人数
+		String formatedCountStr = " ";
+		if (calculateSubDepartment) {
+			int count = EntboostCache.getDepartmentMemberCount(group.getDep_code(), true);
+			formatedCountStr = formatedCountStr + (count>0?("[" + EntboostCache.getDepartmentMemberOnlineCount(group.getDep_code(), true) + "/" + count + "]"):"");
+		} else {
+			formatedCountStr = formatedCountStr + (group.getEmp_count()>0?("[" + EntboostCache.getGroupOnlineCount(group.getDep_code()) + "/" + group.getEmp_count() + "]"):"");
+		}
+		
+		return formatedCountStr;
+	}
+	
 	@Override
 	public View getGroupView(final int groupPosition, final boolean isExpanded, View convertView, ViewGroup parent) {
 		final GroupInfo group = (GroupInfo) getGroup(groupPosition);
@@ -526,14 +582,13 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 		}
 		
 		Context context = MyApplication.getInstance().getApplicationContext();
-		Resources resources = context.getResources();
-		int indentify = resources.getIdentifier(
+		int indentify = context.getResources().getIdentifier(
 				context.getPackageName()+":drawable/"+"tree_type"+group.getType()+"_"+(isExpanded?"opened":"closed"), null, null);
 		
 		//折叠/展开标记
 		holder1.itemsHead.setImageResource(indentify);
-		//名称
-		holder1.itemsText.setText(group.getDep_name() + group.getEmp_online_state());
+		//名称+人数
+		holder1.itemsText.setText(group.getDep_name() + createFormatedStrOfGroupCount(group));
 		
 		//最右边的按钮布局
 		RelativeLayout.LayoutParams layoutParams= new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT); 
@@ -623,9 +678,10 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 						//全选组内全部成员
 						if (groupPosition>=0) {
 							UIUtils.showProgressDialog(mContext, "请稍后...");
+							
 							EntboostUM.loadMembers(depCode, new LoadAllMemberListener() {
 								@Override
-								public void onFailure(final String errMsg) {
+								public void onFailure(int code, final String errMsg) {
 									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
 										public void run() {
@@ -642,8 +698,14 @@ public class GroupAdapter<T> extends BaseExpandableListAdapter {
 										public void run() {
 											List<MemberInfo> memberInfos = EntboostCache.getGroupMemberInfos(depCode);
 											if (memberInfos != null) {
-												MemberSelectActivity.addSelectedMembers(depCode, memberInfos);
 												MemberSelectActivity.addSelectedGroup(group);
+												//MemberSelectActivity.addSelectedMembers(depCode, memberInfos);
+												
+												//去除被过滤的用户
+												for (MemberInfo mi : memberInfos) {
+													if (!excludeUids.contains(mi.getEmp_uid()))
+														MemberSelectActivity.addSelectedMember(mi);
+												}
 												
 												//自动展开子项
 												listView.expandGroup(groupPosition);

@@ -2,7 +2,7 @@ package com.entboost.im.group;
 
 import net.yunim.service.EntboostCache;
 import net.yunim.service.entity.Resource;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,7 +46,7 @@ public class HeadImageAdapter extends BaseAdapter {
 		} else {
 			viewHolder = (HeadViewHolder) convertView.getTag();
 		}
-		viewHolder.img.setImageBitmap(ResourceUtils.getHeadBitmap(((Resource) getItem(position)).getRes_id()));
+		viewHolder.img.setImageBitmap(YIResourceUtils.getHeadBitmap(((Resource) getItem(position)).getRes_id()));
 		return convertView;
 	}
 

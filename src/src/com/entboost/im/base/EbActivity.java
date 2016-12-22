@@ -197,12 +197,6 @@ public class EbActivity extends AbActivity implements EntboostIMListenerInterfac
 	}
 
 	@Override
-	public void onReceiveMyMessage(SysMessage message) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void onReceiveBroadcastMessage(BroadcastMessage message) {
 		// TODO Auto-generated method stub
 

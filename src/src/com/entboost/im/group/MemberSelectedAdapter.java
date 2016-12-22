@@ -6,7 +6,7 @@ import java.util.List;
 
 import net.yunim.service.entity.ContactInfo;
 import net.yunim.service.entity.MemberInfo;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -78,7 +78,7 @@ public class MemberSelectedAdapter extends BaseAdapter{
 		if(obj instanceof MemberInfo){
 			MemberInfo memberInfo = (MemberInfo)obj;
 			holder1.userName.setText(memberInfo.getUsername());
-			Bitmap img = ResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
+			Bitmap img = YIResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
 			if (img != null) {
 				holder1.userImg.setImageBitmap(img);
 			} else {

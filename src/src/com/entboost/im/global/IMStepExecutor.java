@@ -16,6 +16,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import com.entboost.Log4jLog;
 import com.entboost.handler.HandlerToolKit;
 import com.entboost.im.MainActivity;
 import com.entboost.im.setting.SetLogonServiceAddrActivity;
@@ -58,23 +59,31 @@ public class IMStepExecutor {
 					if (dialogs.size() > 0) {
 						return;
 					}
-					AlertDialog dialog = new AlertDialog.Builder(activity/*WelcomeActivity.this*/).setTitle("提示").setMessage(err).setPositiveButton("确定", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							activity.finish();
-							IMStepExecutor.getInstance().exitApplication();
-						}
-					}).show();
-					dialogs.add(dialog);
+					
+					try {
+						AlertDialog dialog = new AlertDialog.Builder(activity).setTitle("提示").setMessage(err).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								activity.finish();
+								IMStepExecutor.getInstance().exitApplication();
+							}
+						}).show();
+						dialogs.add(dialog);
+					} catch (NullPointerException e) {
+						Log4jLog.e(LONG_TAG, "AlertDialog error", e);
+						activity.finish();
+						IMStepExecutor.getInstance().exitApplication();
+					}
 				}
 			};
+			
 			Entboost.addListener(listener);
 		}
 		
 		// 注册开发者appkey，appid的数据类型为Long,数字后面要加上字母l，例如874562130982+l
 		EntboostLC.initAPPKey(MyApplication.appid, MyApplication.appkey, new InitAppKeyListener() {
 			@Override
-			public void onFailure(String err) {
+			public void onFailure(int code, String err) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {
@@ -92,7 +101,7 @@ public class IMStepExecutor {
 						String clientVer = AppUtils.getVersion(activity/*WelcomeActivity.this*/);
 						VersionUtils.checkApkVer(clientVer, activity/*WelcomeActivity.this*/, new CheckClientVerListener() {
 							@Override
-							public void onFailure(String errMsg) {
+							public void onFailure(int code, String errMsg) {
 								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 									@Override
 									public void run() {
@@ -107,7 +116,7 @@ public class IMStepExecutor {
 											// 登录当前的默认用户到Entboost系统，默认用户是最后一次登录的用户
 											EntboostLC.logon(new LogonAccountListener() {
 												@Override
-												public void onFailure(String errMsg) {
+												public void onFailure(int code, String errMsg) {
 													HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 														@Override
 														public void run() {

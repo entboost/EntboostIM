@@ -35,7 +35,7 @@ public class InfoUrlEditActivity extends EbActivity {
 		EntboostUM.editUserInfo(null, null, -1, null, -1, null, -1,
 				null, -1, null, null, sinfoUrl, -1, null, null, null, -1, null, null, new EditInfoListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

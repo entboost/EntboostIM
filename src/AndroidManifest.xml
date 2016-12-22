@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.entboost.im"
     android:versionCode="1"
-    android:versionName="1.5.0.215" >
+    android:versionName="1.5.1.247" >
 
     <uses-sdk android:minSdkVersion="11" /> <!-- android:targetSdkVersion="15" -->
 	
@@ -30,6 +30,8 @@
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<!-- 退出程序 -->
 	<uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+	<!-- 白名单 -->
+	<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 	
     <application
         android:name="com.entboost.im.global.MyApplication"
@@ -60,6 +62,7 @@
         </activity> <!-- android:noHistory="false" -->
         <activity
             android:name="com.entboost.im.chat.ChatActivity"
+            android:windowSoftInputMode="adjustResize"
             android:screenOrientation="portrait" >
         </activity>
         <activity

@@ -1,5 +1,9 @@
 package com.entboost.im.group;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import net.yunim.service.EntboostCache;
 import net.yunim.service.EntboostUM;
 import net.yunim.service.constants.EB_MANAGER_LEVEL;
@@ -7,7 +11,7 @@ import net.yunim.service.entity.MemberInfo;
 import net.yunim.service.entity.PersonGroupInfo;
 import net.yunim.service.listener.DelGroupListener;
 import net.yunim.service.listener.DelMemberListener;
-import net.yunim.service.listener.LoadMemberListener;
+import net.yunim.service.listener.LoadAllMemberListener;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -150,59 +154,47 @@ public class PersonGroupInfoActivity extends EbActivity {
 			home.setText(groupInfo.getUrl());
 			addr.setText(groupInfo.getAddress());
 			description.setText(groupInfo.getDescription());
+			
 			// 拥有群组管理权限
-			if (groupInfo.getMy_emp_id() != null
-					|| groupInfo.getMy_emp_id() > 0) {
-				// 首先需要加载登录用户在当前群组的成员信息，获取在群组的权限
-				EntboostUM.loadMemberByCode(groupInfo.getMy_emp_id(), new LoadMemberListener() {
+			if (groupInfo.getMy_emp_id() != null || groupInfo.getMy_emp_id() > 0) {
+				
+				//加载登录用户在当前群组的成员信息，以获取在群组的权限
+				EntboostUM.loadMembers(groupInfo.getDep_code(), new LoadAllMemberListener() {
 					@Override
-					public void onFailure(String errMsg) {
-//								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
-//									@Override
-//									public void run() {
-//										
-//									}
-//								});
+					public void onFailure(int code, String errMsg) {
 					}
 					
 					@Override
-					public void onLoadMemberSuccess(final MemberInfo member) {
+					public void onLoadAllMemberSuccess() {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {
+								MemberInfo member = EntboostCache.getMember(EntboostCache.getUid(), groupInfo.getDep_code());
+								
 								if(member==null){
 									showToast("加载成员权限信息失败！");
 									return;
 								}
-								if ((member.getManager_level() & EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN
-										.getValue()) == EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN
-										.getValue()) {
+								
+								if ((member.getManager_level() & EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN.getValue()) == EB_MANAGER_LEVEL.EB_LEVEL_DEP_ADMIN.getValue()) {
 									umbtn.setVisibility(View.VISIBLE);
-									persongroup_del_btn
-											.setVisibility(View.VISIBLE);
+									persongroup_del_btn.setVisibility(View.VISIBLE);
+									
 									// 只有管理员才允许修改部门资料
 									isManager = true;
+									
 									ImageView persongroup_name_arrow = (ImageView) findViewById(R.id.persongroup_name_arrow);
-									persongroup_name_arrow
-											.setVisibility(View.VISIBLE);
-									Drawable drawable = getResources()
-											.getDrawable(R.drawable.a4040);
-									drawable.setBounds(0, 0,
-											drawable.getMinimumWidth(),
-											drawable.getMinimumHeight());
-									tel.setCompoundDrawables(null, null,
-											drawable, null);
-									fax.setCompoundDrawables(null, null,
-											drawable, null);
-									email.setCompoundDrawables(null, null,
-											drawable, null);
-									home.setCompoundDrawables(null, null,
-											drawable, null);
-									addr.setCompoundDrawables(null, null,
-											drawable, null);
+									persongroup_name_arrow.setVisibility(View.VISIBLE);
+									Drawable drawable = getResources().getDrawable(R.drawable.a4040);
+									drawable.setBounds(0, 0, drawable.getMinimumWidth(), drawable.getMinimumHeight());
+									
+									tel.setCompoundDrawables(null, null, drawable, null);
+									fax.setCompoundDrawables(null, null, drawable, null);
+									email.setCompoundDrawables(null, null, drawable, null);
+									home.setCompoundDrawables(null, null, drawable, null);
+									addr.setCompoundDrawables(null, null, drawable, null);
 								} else {
-									persongroup_out_btn
-											.setVisibility(View.VISIBLE);
+									persongroup_out_btn.setVisibility(View.VISIBLE);
 								}
 							}
 						});
@@ -214,9 +206,34 @@ public class PersonGroupInfoActivity extends EbActivity {
 
 	@OnClick(R.id.persongroup_usermanager)
 	public void usermanager(View view) {
-		Intent intent = new Intent(this, MemberSelectActivity.class);
-		intent.putExtra("groupid", depid);
-		startActivity(intent);
+		//加载该群组的所有成员
+		EntboostUM.loadMembers(depid, new LoadAllMemberListener() {
+			@Override
+			public void onFailure(int code, String errMsg) {
+			}
+			
+			@Override
+			public void onLoadAllMemberSuccess() {
+				//在主线程执行
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						Intent intent = new Intent(PersonGroupInfoActivity.this, MemberSelectActivity.class);
+						intent.putExtra("groupid", depid);
+						
+						List<MemberInfo> memberInfos = EntboostCache.getGroupMemberInfos(depid);
+						//把当前已在群组内的用户除外
+						List<Long> excludeUids = new ArrayList<Long>();
+						for (MemberInfo mi : memberInfos) {
+							excludeUids.add(mi.getEmp_uid());
+						}
+						intent.putExtra("excludeUids", (Serializable)excludeUids);
+						
+						startActivity(intent);
+					}
+				});
+			}
+		});
 	}
 
 	@OnClick(R.id.persongroup_send_btn)
@@ -227,8 +244,7 @@ public class PersonGroupInfoActivity extends EbActivity {
 				| Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		intent.putExtra(ChatActivity.INTENT_TITLE, groupInfo.getDep_name());
 		intent.putExtra(ChatActivity.INTENT_UID, groupInfo.getDep_code());
-		intent.putExtra(ChatActivity.INTENT_CHATTYPE,
-				ChatActivity.CHATTYPE_GROUP);
+		intent.putExtra(ChatActivity.INTENT_CHATTYPE, ChatActivity.CHATTYPE_GROUP);
 		this.startActivity(intent);
 	}
 
@@ -241,7 +257,7 @@ public class PersonGroupInfoActivity extends EbActivity {
 				if (groupInfo != null) {
 					EntboostUM.delPersonGroup(groupInfo.getDep_code(), new DelGroupListener() {
 								@Override
-								public void onFailure(final String errMsg) {
+								public void onFailure(int code, final String errMsg) {
 									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
 										public void run() {
@@ -280,7 +296,7 @@ public class PersonGroupInfoActivity extends EbActivity {
 				if (groupInfo != null) {
 					EntboostUM.delGroupMember(groupInfo.getMy_emp_id(), new DelMemberListener() {
 						@Override
-						public void onFailure(final String errMsg) {
+						public void onFailure(int code, final String errMsg) {
 							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 								@Override
 								public void run() {

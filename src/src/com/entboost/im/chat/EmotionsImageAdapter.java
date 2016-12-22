@@ -2,7 +2,7 @@ package com.entboost.im.chat;
 
 import net.yunim.service.EntboostCache;
 import net.yunim.service.entity.Resource;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,17 +39,14 @@ public class EmotionsImageAdapter extends BaseAdapter {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		final EmotionsViewHolder viewHolder;
 		if (convertView == null) {
-			convertView = mInflater.inflate(R.layout.gridview_expression_item,
-					null);
+			convertView = mInflater.inflate(R.layout.gridview_expression_item, null);
 			viewHolder = new EmotionsViewHolder();
-			viewHolder.img = (ImageView) convertView
-					.findViewById(R.id.sendmsg_emotion);
+			viewHolder.img = (ImageView) convertView.findViewById(R.id.sendmsg_emotion);
 			convertView.setTag(viewHolder);
 		} else {
 			viewHolder = (EmotionsViewHolder) convertView.getTag();
 		}
-		viewHolder.img.setImageBitmap(ResourceUtils
-				.getEmotionBitmap(((Resource) getItem(position)).getRes_id()));
+		viewHolder.img.setImageBitmap(YIResourceUtils.getEmotionBitmap(((Resource) getItem(position)).getRes_id()));
 		return convertView;
 	}
 

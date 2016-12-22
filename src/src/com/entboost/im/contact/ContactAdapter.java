@@ -28,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.entboost.im.R;
+import com.entboost.im.group.MemberSelectActivity;
 import com.entboost.ui.utils.AbImageUtil;
 
 public class ContactAdapter extends BaseExpandableListAdapter {
@@ -36,6 +37,8 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 	private Context mContext;
 	private boolean selectMember; //是否选择人员视图
 	private boolean selectOne = false; //是否单选
+	//除外的用户编号列表(不允许选中这些编号)
+	private List<Long> excludeUids = new ArrayList<Long>();
 	
 	private ExpandableListView listView;
 
@@ -49,6 +52,10 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 	
 	public void setSelectOne(boolean selectOne) {
 		this.selectOne = selectOne;
+	}
+
+	public void setExcludeUids(List<Long> excludeUids) {
+		this.excludeUids = excludeUids;
 	}
 
 	public void initFriendList(List<ContactGroup> grouplist, List<ContactInfo> contactInfos) {
@@ -130,58 +137,70 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 			convertView.setTag(holder2);
 		} else {
 			holder2 = (ItemViewHolder) convertView.getTag();
+			holder2.user_select.setImageResource(0);
 		}
 		
-		if (selectMember && !selectOne) {
+		final ContactInfo ci = (ContactInfo) getChild(groupPosition, childPosition);
+		
+		if (selectMember) {
 			holder2.user_select.setVisibility(View.VISIBLE);
+			
+			if (selectOne || ci.getCon_uid()==null || excludeUids.contains(ci.getCon_uid())) {
+				holder2.user_select.setVisibility(View.INVISIBLE);
+			}
+			
+			if (MemberSelectActivity.isContactSelected(ci))
+				holder2.user_select.setImageResource(R.drawable.uitb_57);
 		}
 		
-		final ContactInfo mi = (ContactInfo) getChild(groupPosition, childPosition);
 		String name = null;
-		if (StringUtils.isNotBlank(mi.getName())) {
-			name = mi.getName();
+		if (StringUtils.isNotBlank(ci.getName())) {
+			name = ci.getName();
 		} else {
-			name = mi.getContact();
+			name = ci.getContact();
 		}
 		
 		holder2.userName.setText(name);
 		String type = "";
-		if (mi.getCon_uid() == null) {
+		if (ci.getCon_uid() == null) {
 			type = "[非系统用户]";
-			if (selectMember) {
+			if (selectMember)
 				holder2.user_select.setVisibility(View.INVISIBLE);
-			}
+			
 			holder2.userImg.setImageBitmap(AbImageUtil.grey(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_user)));
 		} else {
 			AppAccountInfo appInfo = EntboostCache.getAppInfo();
-			if (mi.getType() == 0 && (appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) == AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
+			if (ci.getType() == 0 && (appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) == AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
 				type = "[系统用户-未验证]";
 			} else {
 				type = "[系统用户]";
 			}
-			if (mi.getState() <= EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE.getValue()) {
+			if (ci.getState() <= EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE.getValue()) {
 				holder2.userImg.setImageBitmap(AbImageUtil.grey(BitmapFactory.decodeResource(mContext.getResources(), R.drawable.default_user)));
 			} else {
 				holder2.userImg.setImageResource(R.drawable.default_user);
 			}
 		}
 		
-		holder2.userImg.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(mContext, ContactInfoActivity.class);
-				if (mi != null) {
-					intent.putExtra("con_id", mi.getCon_id());
-					mContext.startActivity(intent);
+		//点击头像事件；选择视图不允许点击
+		if (!selectMember) {
+			holder2.userImg.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(mContext, ContactInfoActivity.class);
+					if (ci != null) {
+						intent.putExtra("con_id", ci.getCon_id());
+						mContext.startActivity(intent);
+					}
 				}
-			}
-		});
+			});
+		}
 		
 		AppAccountInfo appInfo = EntboostCache.getAppInfo();
 		if ((appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) != AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
 			holder2.userImg.setImageResource(R.drawable.default_user);
 		}
-		holder2.description.setText(type + mi.getDescription());
+		holder2.description.setText(type + ci.getDescription());
 		return convertView;
 	}
 
@@ -243,20 +262,19 @@ public class ContactAdapter extends BaseExpandableListAdapter {
 			if (group.getUgid() != null && mList.get(group.getUgid()) != null) {
 				size = mList.get(group.getUgid()).size();
 				for (ContactInfo ci : mList.get(group.getUgid())) {
-					if (ci.getState() > EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE
-							.getValue()) {
+					if (ci.getState() > EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE.getValue()) {
 						++onlineSize;
 					}
 				}
 			}
+			
 			AppAccountInfo appInfo = EntboostCache.getAppInfo();
 			if (size != 0) {
-				if ((appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) != AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
-					holder1.itemsText.setText(group.getGroupname() + " ["
-							+ size + "]");
+				if ((appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) 
+						!= AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
+					holder1.itemsText.setText(group.getGroupname() + " [" + size + "]");
 				} else {
-					holder1.itemsText.setText(group.getGroupname() + " ["
-							+ onlineSize + "/" + size + "]");
+					holder1.itemsText.setText(group.getGroupname() + " [" + onlineSize + "/" + size + "]");
 				}
 			} else {
 				holder1.itemsText.setText(group.getGroupname());

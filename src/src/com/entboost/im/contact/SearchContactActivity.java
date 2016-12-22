@@ -50,7 +50,7 @@ public class SearchContactActivity extends EbActivity {
 				
 				EntboostUM.searchMember(search.getText().toString(), new SearchMemberListener() {
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {

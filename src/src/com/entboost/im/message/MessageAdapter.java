@@ -2,12 +2,11 @@ package com.entboost.im.message;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import net.yunim.service.cache.EbCache;
 import net.yunim.service.entity.DynamicNews;
 import net.yunim.service.entity.GroupInfo;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -83,10 +82,14 @@ public class MessageAdapter extends BaseAdapter {
 			holder.itemsCount.setVisibility(View.GONE);
 		} else {
 			holder.itemsCount.setVisibility(View.VISIBLE);
-			holder.itemsCount.setText(String.valueOf(dyn.getNoReadNum()));
+			if (dyn.getNoReadNum()<100)
+				holder.itemsCount.setText(String.valueOf(dyn.getNoReadNum()));
+			else 
+				holder.itemsCount.setText("99+");
 		}
+		
 		holder.itemsTitle.setText(dyn.getTitle());
-		holder.itemsText.setText(UIUtils.getTipCharSequence(dyn.getContent()));
+		holder.itemsText.setText(UIUtils.getTipCharSequence(mContext.getResources(), dyn.getContent(), true));
 		holder.itemsTime.setText(AbDateUtil.formatDateStr2Desc(AbDateUtil
 				.getStringByFormat(dyn.getTime(), AbDateUtil.dateFormatYMDHMS), AbDateUtil.dateFormatYMDHMS));
 		if (dyn.getType() == DynamicNews.TYPE_GROUPCHAT) {
@@ -106,7 +109,7 @@ public class MessageAdapter extends BaseAdapter {
 				 || dyn.getType() == DynamicNews.TYPE_MYSYSTEMMESSAGE) {
 			holder.itemsIcon.setImageResource(R.drawable.message_head);
 		} else {
-			Bitmap img = ResourceUtils.getHeadBitmap(dyn.getHid());
+			Bitmap img = YIResourceUtils.getHeadBitmap(dyn.getHid());
 			if (img != null) {
 				holder.itemsIcon.setImageBitmap(img);
 			} else {

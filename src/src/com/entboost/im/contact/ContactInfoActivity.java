@@ -60,7 +60,7 @@ public class ContactInfoActivity extends EbActivity {
 			showProgressDialog("正在验证好友");
 			EntboostUM.addContact(contactInfo.getContact(), contactInfo.getName(), contactInfo.getDescription(), contactInfo.getUgid(), new EditContactListener() {
 				@Override
-				public void onFailure(final String errMsg) {
+				public void onFailure(int code, final String errMsg) {
 					HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 						@Override
 						public void run() {
@@ -96,6 +96,7 @@ public class ContactInfoActivity extends EbActivity {
 		TextView contact_job_title = (TextView) findViewById(R.id.contact_job_title);
 		TextView contact_company = (TextView) findViewById(R.id.contact_company);
 		contactInfo = EntboostCache.getContactInfoById(con_id);
+		
 		if (contactInfo != null) {
 			account.setText(contactInfo.getContact());
 			if (contactInfo.getCon_uid() == null) {
@@ -174,7 +175,7 @@ public class ContactInfoActivity extends EbActivity {
 				showProgressDialog("删除联系人");
 				EntboostUM.delContact(contactInfo.getCon_id(), new DelContactListener() {
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {

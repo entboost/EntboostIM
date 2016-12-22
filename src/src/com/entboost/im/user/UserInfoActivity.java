@@ -17,7 +17,7 @@ import net.yunim.service.entity.AccountInfo;
 import net.yunim.service.entity.Dict;
 import net.yunim.service.listener.EditInfoListener;
 import net.yunim.service.listener.LoadDictListener;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -69,8 +69,6 @@ public class UserInfoActivity extends EbActivity {
 	private TextView user_id;
 	@ViewInject(R.id.user_username)
 	private TextView user_username;
-	@ViewInject(R.id.user_type)
-	private TextView user_type;
 	@ViewInject(R.id.user_description)
 	private TextView user_description;
 	@ViewInject(R.id.user_url)
@@ -128,7 +126,7 @@ public class UserInfoActivity extends EbActivity {
 				EntboostUM.editUserInfo(null, null, -1, null, -1, null, -1,
 					null, -1, null, null, null, gender, null, null, null, -1, null, null, new EditInfoListener() {
 						@Override
-						public void onFailure(final String errMsg) {
+						public void onFailure(int code, final String errMsg) {
 							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 								@Override
 								public void run() {
@@ -172,7 +170,7 @@ public class UserInfoActivity extends EbActivity {
 		EntboostUM.editUserInfo(null, null, -1, null, -1, null, -1, null, -1,
 				null, null, null, -1, null, null, null, birthday, null, null, new EditInfoListener() {
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {
@@ -223,33 +221,29 @@ public class UserInfoActivity extends EbActivity {
 		super.onResume();
 		user = EntboostCache.getUser();
 		if (user != null) {
-			Bitmap img = ResourceUtils.getHeadBitmap(user.getHead_rid());
+			Bitmap img = YIResourceUtils.getHeadBitmap(user.getHead_rid());
 			if (img != null) {
 				userHead.setImageBitmap(img);
 			} else {
 				ImageLoader.getInstance().displayImage(user.getHeadUrl(), userHead, MyApplication.getInstance().getUserImgOptions());
 			}
+			
 			user_account.setText(user.getAccount());
 			user_username.setText(user.getUsername());
 			user_id.setText(user.getUid() + "");
-			if (user.getLogon_type() == EB_LOGON_TYPE.LOGON_TYPE_VISITOR
-					.getValue()) {
-				user_type.setText("游客");
-			} else {
-				user_type.setText("注册用户");
-			}
 			user_description.setText(user.getDescription());
 			user_url.setText(user.getUrl());
+			
 			if (user.getGender() == EB_GENDER_TYPE.EB_GENDER_MALE.ordinal()) {
 				segment_text.check(user_gender_male.getId());
 			} else if (user.getGender() == EB_GENDER_TYPE.EB_GENDER_FEMALE
 					.ordinal()) {
 				segment_text.check(user_gender_female.getId());
 			}
+			
 			if (user.getBirthday() > 0) {
 				Calendar c = Calendar.getInstance();
-				c.setTime(AbDateUtil.getDateByFormat(user.getBirthday() + "",
-						"yyyyMMdd"));
+				c.setTime(AbDateUtil.getDateByFormat(user.getBirthday() + "", "yyyyMMdd"));
 				mYear = c.get(Calendar.YEAR);
 				mMonth = c.get(Calendar.MONTH) + 1;
 				mDay = c.get(Calendar.DAY_OF_MONTH);
@@ -258,8 +252,8 @@ public class UserInfoActivity extends EbActivity {
 						.append(mMonth < 10 ? "0" + mMonth : mMonth)
 						.append("-").append((mDay < 10) ? "0" + mDay : mDay));
 			}
-			user_area
-					.setText((user.getArea1s() == null ? "" : user.getArea1s())
+			
+			user_area.setText((user.getArea1s() == null ? "" : user.getArea1s())
 							+ (user.getArea2s() == null ? "" : user.getArea2s())
 							+ (user.getArea3s() == null ? "" : user.getArea3s())
 							+ (user.getArea4s() == null ? "" : user.getArea4s()));
@@ -369,7 +363,7 @@ public class UserInfoActivity extends EbActivity {
 			public void onScrollingFinished(WheelView wheel) {
 				EntboostUM.loadDict(countries.get(wheel.getCurrentItem()).getDict_id(), new LoadDictListener() {
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {
@@ -392,7 +386,7 @@ public class UserInfoActivity extends EbActivity {
 								if (provinces.size()>0 && province.getCurrentItem()>-1) {
 									EntboostUM.loadDict(provinces.get(province.getCurrentItem()).getDict_id(), new LoadDictListener() {
 										@Override
-										public void onFailure(final String errMsg) {
+										public void onFailure(int code, final String errMsg) {
 											HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 												@Override
 												public void run() {
@@ -440,7 +434,7 @@ public class UserInfoActivity extends EbActivity {
 			public void onScrollingFinished(WheelView wheel) {
 				EntboostUM.loadDict(provinces.get(wheel.getCurrentItem()).getDict_id(), new LoadDictListener() {
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {
@@ -472,7 +466,7 @@ public class UserInfoActivity extends EbActivity {
 		showProgressDialog("正在加载地区信息");
 		EntboostUM.loadDict(0, new LoadDictListener() {
 			@Override
-			public void onFailure(String errMsg) {
+			public void onFailure(int code, String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {
@@ -515,7 +509,7 @@ public class UserInfoActivity extends EbActivity {
 						final Dict dCountry = getDefaultCountry(countries);
 						EntboostUM.loadDict(dCountry.getDict_id(), new LoadDictListener() {
 							@Override
-							public void onFailure(String errMsg) {
+							public void onFailure(int code, String errMsg) {
 								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 									@Override
 									public void run() {
@@ -545,7 +539,7 @@ public class UserInfoActivity extends EbActivity {
 											}
 											EntboostUM.loadDict(provineId, new LoadDictListener() {
 												@Override
-												public void onFailure(String errMsg) {
+												public void onFailure(int code, String errMsg) {
 													HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 														@Override
 														public void run() {
@@ -621,7 +615,7 @@ public class UserInfoActivity extends EbActivity {
 						, -1, null, null, null, -1, null, null, null, -1, null, null, new EditInfoListener() {
 
 					@Override
-					public void onFailure(String errMsg) {
+					public void onFailure(int code, String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {

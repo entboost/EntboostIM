@@ -37,7 +37,7 @@ public class SelectHeadImgActivity extends EbActivity {
 				showProgressDialog("正在设置头像");
 				EntboostUM.setUserHead(head.getRes_id(), memberCode, new SetHeadListener() {
 					@Override
-					public void onFailure(String arg0) {
+					public void onFailure(int code, String arg0) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {

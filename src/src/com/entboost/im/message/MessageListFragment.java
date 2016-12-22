@@ -43,7 +43,10 @@ public class MessageListFragment extends EbFragment {
 			dynamicNewsAdapter.notifyDataSetChanged();
 			int noReadNums = EntboostCache.getUnreadNumDynamicNews();
 			if (noReadNums > 0) {
-				((EbMainActivity) activity).mBottomTabView.getItem(0).showTip(noReadNums);
+				if (noReadNums<100)
+					((EbMainActivity) activity).mBottomTabView.getItem(0).showTip(noReadNums);
+				else 
+					((EbMainActivity) activity).mBottomTabView.getItem(0).showTip("99+");
 			} else {
 				((EbMainActivity) activity).mBottomTabView.getItem(0).hideTip();
 			}
@@ -91,8 +94,7 @@ public class MessageListFragment extends EbFragment {
 		// item被点击事件
 		mAbPullListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				// 获取该行的数据
 				DynamicNews newsInfo = (DynamicNews) dynamicNewsAdapter.getItem(position);
 				if (newsInfo != null) {
@@ -100,7 +102,7 @@ public class MessageListFragment extends EbFragment {
 					//newsInfo.readAll();
 					EntboostCache.markReadDynamicNewsById(newsInfo.getId());
 					
-					//读取并显示全部未读消息的总数量
+					//读取并在底部导航栏显示全部未读消息的总数量
 					int noReadNums = EntboostCache.getUnreadNumDynamicNews();
 					if (noReadNums > 0) {
 						((EbMainActivity) activity).mBottomTabView.getItem(0).showTip(noReadNums);
@@ -108,7 +110,7 @@ public class MessageListFragment extends EbFragment {
 						((EbMainActivity) activity).mBottomTabView.getItem(0).hideTip();
 					}
 					
-					if (newsInfo.getType() == DynamicNews.TYPE_GROUPCHAT || newsInfo.getType() == DynamicNews.TYPE_USERCHAT) {
+					if (newsInfo.getType() == DynamicNews.TYPE_GROUPCHAT || newsInfo.getType() == DynamicNews.TYPE_USERCHAT) { //聊天消息
 						Intent intent = new Intent(MessageListFragment.this.getActivity(), ChatActivity.class);
 						if (newsInfo.getType() == DynamicNews.TYPE_GROUPCHAT) {
 							intent.putExtra(ChatActivity.INTENT_CHATTYPE, ChatActivity.CHATTYPE_GROUP);
@@ -116,40 +118,24 @@ public class MessageListFragment extends EbFragment {
 						intent.putExtra(ChatActivity.INTENT_TITLE, newsInfo.getTitle());
 						intent.putExtra(ChatActivity.INTENT_UID, newsInfo.getSender());
 						startActivity(intent);
-					} else if (newsInfo.getType() == DynamicNews.TYPE_CALL) {
-						Intent intent = new Intent(MessageListFragment.this
-								.getActivity(), CallListActivity.class);
+					} else if (newsInfo.getType() == DynamicNews.TYPE_CALL) { //被邀请加入聊天的通知
+						Intent intent = new Intent(MessageListFragment.this.getActivity(), CallListActivity.class);
 						startActivity(intent);
-					} else if (newsInfo.getType() == DynamicNews.TYPE_MYMESSAGE) {
-						FuncInfo funcInfo = EntboostCache
-								.getMessageFuncInfo();
+					} else if (newsInfo.getType() == DynamicNews.TYPE_MYMESSAGE || newsInfo.getType() == DynamicNews.TYPE_BMESSAGE) { //我的消息(包括系统消息和广播消息)
+						FuncInfo funcInfo = EntboostCache.getMessageFuncInfo();
 						if (funcInfo != null) {
-							Intent intent = new Intent(activity,
-									FunctionMainActivity.class);
+							Intent intent = new Intent(activity, FunctionMainActivity.class);
 							intent.putExtra("funcInfo", funcInfo);
-							intent.putExtra("tab_type", FuncInfo.SYS_MSG);
+							intent.putExtra("tab_type", newsInfo.getType() == DynamicNews.TYPE_MYMESSAGE?FuncInfo.SYS_MSG:FuncInfo.BC_MSG);
 							startActivity(intent);
 						}
-					} else if (newsInfo.getType() == DynamicNews.TYPE_BMESSAGE) {
-						FuncInfo funcInfo = EntboostCache
-								.getMessageFuncInfo();
-						if (funcInfo != null) {
-							Intent intent = new Intent(activity,
-									FunctionMainActivity.class);
-							intent.putExtra("funcInfo", funcInfo);
-							intent.putExtra("tab_type", FuncInfo.BC_MSG);
-							startActivity(intent);
-						}
-//						Intent intent = new Intent(MessageListFragment.this
-//								.getActivity(),
-//								BroadcastMessageListActivity.class);
+//						Intent intent = new Intent(MessageListFragment.this.getActivity(), BroadcastMessageListActivity.class);
 //						startActivity(intent);
 					}
-
 				}
-
 			}
 		});
+		
 		listener = new EntboostIMListener() {
 			@Override
 			public void onReceiveDynamicNews(DynamicNews news) {
@@ -158,14 +144,13 @@ public class MessageListFragment extends EbFragment {
 			}
 		};
 		Entboost.addListener(listener);
+		
 		return view;
 	}
-
+	
 	@Override
 	public void onDestroy() {
 		Entboost.removeListener(listener);
 		super.onDestroy();
 	}
-	
-	
 }

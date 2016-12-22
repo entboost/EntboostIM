@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.entboost.ui.utils.ImageLoader;
+import net.yunim.utils.YIImageLoader;
 
 public class PageInfo extends LinearLayout {
 
@@ -44,8 +44,7 @@ public class PageInfo extends LinearLayout {
 		this.setVisibility(View.GONE);
 
 		errorimg = new ImageView(context);
-		errorimg.setImageBitmap(ImageLoader.getInstance().getBitmapFormSrc(
-				"image/error.png"));
+		errorimg.setImageBitmap(YIImageLoader.getInstance().getBitmapFormSrc("image/error.png"));
 		errorimg.setVisibility(View.GONE);
 		this.addView(errorimg);
 

@@ -25,7 +25,7 @@ public class ExtAudioRecorder {
 	private final static int[] sampleRates = { 44100, 22050, 11025, 8000 };
 	private static ExtAudioRecorder result = null;
 
-	public static ExtAudioRecorder getInstanse(Boolean recordingCompressed, VoiceCallback callback) {
+	public static ExtAudioRecorder getInstance(Boolean recordingCompressed, VoiceCallback callback) {
 		if (recordingCompressed) {
 			result = new ExtAudioRecorder(false, AudioSource.MIC,
 					sampleRates[3], AudioFormat.CHANNEL_CONFIGURATION_MONO,
@@ -670,7 +670,7 @@ public class ExtAudioRecorder {
 
 	public static void main(String[] args) {
 		// 获取类的实例
-		ExtAudioRecorder recorder = ExtAudioRecorder.getInstanse(false, null); // 未压缩的录音（WAV）
+		ExtAudioRecorder recorder = ExtAudioRecorder.getInstance(false, null); // 未压缩的录音（WAV）
 		recorder.recordChat("/mnt/", "upload_media.wav");
 		// 录音时间
 		try {

@@ -50,7 +50,7 @@ public class SetLogonServiceAddrActivity extends EbActivity {
 					showProgressDialog("正在修改服务器地址，并重新验证AppKey!");
 					EntboostLC.initAPPKey(name, MyApplication.appid, MyApplication.appkey, new InitAppKeyListener() {
 						@Override
-						public void onFailure(final String errMsg) {
+						public void onFailure(int code, final String errMsg) {
 							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 								@Override
 								public void run() {

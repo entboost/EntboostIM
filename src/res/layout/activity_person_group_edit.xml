@@ -4,7 +4,8 @@
     android:layout_height="fill_parent"
     android:background="@color/mainPageBG"
     android:gravity="center_horizontal"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    >
 
     <RelativeLayout
         android:id="@+id/pgroup_name_layout"
@@ -36,14 +37,13 @@
             android:layout_toRightOf="@id/login_user_img"
             android:background="@null"
             android:hint="群组名称"
-            android:focusable="true"
             android:textColor="@color/text_color_2"
             android:inputType="textEmailAddress"
             android:singleLine="true"
             android:textSize="16sp" />
     </RelativeLayout>
-
-    <EditText
+	
+   <EditText
         android:id="@+id/pgroup_desc"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -58,7 +58,6 @@
         android:textSize="16sp"
         android:inputType="textMultiLine" >
 
-        <requestFocus />
     </EditText>
 
     <Button

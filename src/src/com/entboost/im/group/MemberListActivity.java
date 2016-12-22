@@ -116,7 +116,7 @@ public class MemberListActivity extends EbActivity {
 		
 		EntboostUM.loadMembers(depid, new LoadAllMemberListener() {
 			@Override
-			public void onFailure(String errMsg) {
+			public void onFailure(int code, String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {
@@ -150,9 +150,9 @@ public class MemberListActivity extends EbActivity {
 					@Override
 					public void onItemClick() {
 						pageInfo.showProgress("正在加载群组成员信息");
-						EntboostUM.loadServiceMembers(depid, new LoadAllMemberListener() {
+						EntboostUM.loadMembers(depid, new LoadAllMemberListener() {
 							@Override
-							public void onFailure(String errMsg) {
+							public void onFailure(int code, String errMsg) {
 								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 									@Override
 									public void run() {

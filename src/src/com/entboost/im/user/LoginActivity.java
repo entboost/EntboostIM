@@ -50,6 +50,8 @@ public class LoginActivity extends EbActivity {
 	private Button registerBtn;
 	@ViewInject(R.id.login_vistor_login_btn)
 	private Button vistor_loginBtn;
+	@ViewInject(R.id.login_forget_passwd)
+	private Button forget_passwdBtn;
 	@ViewInject(R.id.ent_logo)
 	private ImageView entlogo;
 	@ViewInject(R.id.login_username_downImg)
@@ -77,6 +79,8 @@ public class LoginActivity extends EbActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		app_version.setText(AppUtils.getVersionName(this));
+		
 		AppAccountInfo appInfo = EntboostCache.getAppInfo();
 		if (appInfo != null) {
 			if (appInfo.getOpen_register() == 0) {
@@ -84,17 +88,27 @@ public class LoginActivity extends EbActivity {
 			} else {
 				registerBtn.setVisibility(View.VISIBLE);
 			}
+			
 			if (appInfo.getOpen_visitor() == 0) {
 				vistor_loginBtn.setVisibility(View.GONE);
 			} else {
 				vistor_loginBtn.setVisibility(View.VISIBLE);
 			}
+			
+			if (appInfo.getForget_pwd_url()==null) {
+				forget_passwdBtn.setVisibility(View.GONE);
+			} else {
+				forget_passwdBtn.setVisibility(View.VISIBLE);
+			}
+			
 			if (appInfo.getEnt_logo_url() != null) {
 				ImageLoader.getInstance().displayImage(appInfo.getEnt_logo_url(), entlogo, MyApplication.getInstance().getDefaultImgOptions());
 			} else {
 				entlogo.setImageResource(R.drawable.entboost_logo);
 			}
-			app_version.setText(AppUtils.getVersionName(this));
+		} else {
+			vistor_loginBtn.setVisibility(View.GONE);
+			forget_passwdBtn.setVisibility(View.GONE);
 		}
 	}
 
@@ -102,9 +116,11 @@ public class LoginActivity extends EbActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_login);
+		
 		AbTitleBar titleBar = this.getTitleBar();
 		titleBar.setVisibility(View.GONE);
 		ViewUtils.inject(this);
+		
 		String[] accountHistory = EntboostCache.getAccountHistorys();
 		if (accountHistory == null || accountHistory.length <= 1) {
 			login_username_downImg.setVisibility(View.INVISIBLE);
@@ -117,6 +133,7 @@ public class LoginActivity extends EbActivity {
 		loginName.addTextChangedListener(new TextWatcher() {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				loginPWD.setText("");
 			}
 
 			@Override
@@ -245,7 +262,7 @@ public class LoginActivity extends EbActivity {
 		showProgressDialog("努力登录中...");
 		EntboostLC.logon(name, pwd, new LogonAccountListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {
@@ -285,7 +302,7 @@ public class LoginActivity extends EbActivity {
 		EntboostLC.findPwd(name, new FindPWDListener() {
 
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {
@@ -321,7 +338,7 @@ public class LoginActivity extends EbActivity {
 		EntboostLC.logonVisitor(new LogonAccountListener() {
 
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

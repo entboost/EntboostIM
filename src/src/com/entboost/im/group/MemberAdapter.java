@@ -9,7 +9,7 @@ import net.yunim.service.EntboostCache;
 import net.yunim.service.constants.EB_MANAGER_LEVEL;
 import net.yunim.service.constants.EB_USER_LINE_STATE;
 import net.yunim.service.entity.MemberInfo;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -131,7 +131,7 @@ public class MemberAdapter extends BaseAdapter {
 				}
 			}
 		});
-		Bitmap img = ResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
+		Bitmap img = YIResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
 		if (img != null) {
 			if (memberInfo.getState() <= EB_USER_LINE_STATE.EB_LINE_STATE_OFFLINE
 					.getValue()) {

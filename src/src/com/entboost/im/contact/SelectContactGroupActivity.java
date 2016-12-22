@@ -66,7 +66,7 @@ public class SelectContactGroupActivity extends EbActivity {
 						showProgressDialog("正在编辑分组！");
 						EntboostUM.editContactGroup(contactGroup.getUgid(), value, new EditGroupListener() {
 							@Override
-							public void onFailure(final String errMsg) {
+							public void onFailure(int code, final String errMsg) {
 								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 									@Override
 									public void run() {
@@ -101,7 +101,7 @@ public class SelectContactGroupActivity extends EbActivity {
 				showProgressDialog("正在删除分组！");
 				EntboostUM.delContactGroup(contactGroup.getUgid(), new DelGroupListener() {
 							@Override
-							public void onFailure(final String errMsg) {
+							public void onFailure(int code, final String errMsg) {
 								HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 									@Override
 									public void run() {
@@ -193,7 +193,7 @@ public class SelectContactGroupActivity extends EbActivity {
 								showProgressDialog("正在添加分组！");
 								EntboostUM.addContactGroup(value, new EditGroupListener() {
 									@Override
-									public void onFailure(final String errMsg) {
+									public void onFailure(int code, final String errMsg) {
 										HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 											@Override
 											public void run() {
@@ -226,7 +226,7 @@ public class SelectContactGroupActivity extends EbActivity {
 				showProgressDialog("正在移动到其它分组");
 				EntboostUM.moveContact(con_id, contactGroupSelectAdapter.getUg_id(), new EditContactListener() {
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {

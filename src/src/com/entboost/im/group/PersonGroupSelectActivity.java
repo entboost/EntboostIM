@@ -6,7 +6,7 @@ import java.util.Set;
 import net.yunim.service.EntboostCache;
 import net.yunim.service.EntboostUM;
 import net.yunim.service.entity.PersonGroupInfo;
-import net.yunim.service.listener.AddToPersonGroupListener;
+import net.yunim.service.listener.AddToGroupListener;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -70,6 +70,7 @@ public class PersonGroupSelectActivity extends EbActivity {
 		config.setBackground_resId(R.drawable.popmenu);
 		config.setTextColor(Color.WHITE);
 		config.setShowAsDropDownYoff(28);
+		
 		this.getTitleBar().addRightImageButton(R.drawable.ic_action_save, null, new PopMenuItem(new PopMenuItemOnClickListener() {
 			@Override
 			public void onItemClick() {
@@ -79,20 +80,10 @@ public class PersonGroupSelectActivity extends EbActivity {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							showProgressDialog("正在邀请加入群组！");
-							EntboostUM.addToPersonGroup(depIds, uid, new AddToPersonGroupListener() {
+							EntboostUM.addToPersonGroup(depIds, uid, new AddToGroupListener() {
+								
 								@Override
-								public void onFailure(final String errMsg) {
-									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
-										@Override
-										public void run() {
-											removeProgressDialog();
-											showToast(errMsg);
-										}
-									});
-								}
-
-								@Override
-								public void onSuccess() {
+								public void onSuccess(Long depCode, Long uid, String account) {
 									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
 										public void run() {
@@ -101,6 +92,22 @@ public class PersonGroupSelectActivity extends EbActivity {
 											finish();
 										}
 									});
+								}
+
+								@Override
+								public void onFailure(int code, final String errMsg, Long depCode, Long uid, String account) {
+									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+										@Override
+										public void run() {
+											removeProgressDialog();
+											showToast(errMsg);
+										}
+									});	
+								}
+
+								@Override
+								public void onFailure(int code, final String errMsg) {
+									//do nothing
 								}
 							});
 						}

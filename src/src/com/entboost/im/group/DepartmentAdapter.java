@@ -3,6 +3,7 @@ package com.entboost.im.group;
 import java.util.Collections;
 import java.util.Vector;
 
+import net.yunim.service.EntboostCache;
 import net.yunim.service.constants.EB_GROUP_TYPE;
 import net.yunim.service.entity.DepartmentInfo;
 import net.yunim.service.entity.GroupInfo;
@@ -79,7 +80,7 @@ public class DepartmentAdapter extends BaseAdapter {
 			holder1 = (GroupViewHolder) convertView.getTag();
 		}
 		holder1.userImg.setImageResource(R.drawable.group_head_0);
-		holder1.itemsText.setText(group.getDep_name()+group.getEmp_online_state());
+		holder1.itemsText.setText(group.getDep_name()+ " " + (group.getEmp_count()>0?("[" + EntboostCache.getGroupOnlineCount(group.getDep_code()) + "/" + group.getEmp_count() + "]"):""));
 		holder1.description.setText(mContext.getResources().getStringArray(
 				R.array.group_type)[EB_GROUP_TYPE.getIndex(group.getType())]);
 		return convertView;

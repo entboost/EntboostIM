@@ -96,11 +96,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:autoLink="all"
                     android:clickable="true"
                     android:padding="5dp"
                     android:textColor="@color/black"
-                    android:textColorLink="@color/text_link"
                     android:textSize="16sp" />
             </LinearLayout>
 

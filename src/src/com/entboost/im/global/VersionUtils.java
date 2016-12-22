@@ -7,8 +7,10 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import net.yunim.eb.constants.EBConstants;
 import net.yunim.service.EntboostUM;
 import net.yunim.service.cache.EbCache;
+import net.yunim.service.constants.EB_STATE_CODE;
 import net.yunim.service.entity.ClientVer;
 import net.yunim.service.listener.CheckClientVerListener;
 import android.app.AlertDialog;
@@ -38,9 +40,9 @@ public class VersionUtils {
 		EntboostUM.checkClientVer(clientVer, new CheckClientVerListener() {
 
 			@Override
-			public void onFailure(String errMsg) {
+			public void onFailure(int code, String errMsg) {
 				if (listener != null) {
-					listener.onFailure(errMsg);
+					listener.onFailure(code, errMsg);
 				} else {
 					UIUtils.showToast(context, errMsg);
 				}
@@ -53,7 +55,7 @@ public class VersionUtils {
 					//if (Integer.valueOf(StringUtils.substringAfterLast(cver, ".")) <= Integer.valueOf(StringUtils.substringAfterLast(clientVer, "."))) {
 					if (cver.compareTo(clientVer)<=0) {
 						if(listener!=null){
-							listener.onFailure("当前是最新版本:"+clientVer);
+							listener.onFailure(EB_STATE_CODE.EB_STATE_ERROR.getValue(), "当前是最新版本:"+clientVer);
 						}else{
 							UIUtils.showToast(context, "当前是最新版本:"+clientVer);
 						}
@@ -61,7 +63,7 @@ public class VersionUtils {
 					}
 				} catch (Exception e) {
 					if(listener!=null){
-						listener.onFailure("当前是最新版本:"+clientVer);
+						listener.onFailure(EB_STATE_CODE.EB_STATE_ERROR.getValue(), "当前是最新版本:"+clientVer);
 					}else{
 						UIUtils.showToast(context, "当前是最新版本:"+clientVer);
 					}
@@ -72,7 +74,7 @@ public class VersionUtils {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
 						if (listener != null) {
-							listener.onFailure("取消更新");
+							listener.onFailure(EB_STATE_CODE.EB_STATE_ERROR.getValue(), "取消更新");
 						}
 					}
 				});

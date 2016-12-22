@@ -69,7 +69,7 @@ public class RegisterActivity extends EbActivity {
 		showProgressDialog("正在注册中...");
 		EntboostUM.emailRegister(email,nameStr, pwdstr, entname, new RegisterListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

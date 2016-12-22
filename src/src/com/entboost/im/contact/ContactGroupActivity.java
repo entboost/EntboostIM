@@ -45,7 +45,7 @@ public class ContactGroupActivity extends EbActivity {
 		showProgressDialog("修改联系人分组");
 		EntboostUM.editContactGroup(group.getUgid(), contactgroup_group_str, new EditGroupListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {
@@ -73,7 +73,7 @@ public class ContactGroupActivity extends EbActivity {
 		showProgressDialog("正在删除分组！");
 		EntboostUM.delContactGroup(group.getUgid(), new DelGroupListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

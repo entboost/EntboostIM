@@ -151,7 +151,7 @@ public class CallAdapter extends BaseAdapter {
 					callInfo.setType(CallInfo.TYPE_ACCEPT);
 					EntboostUM.addContact(callInfo, new EditContactListener() {
 						@Override
-						public void onFailure(final String arg0) {
+						public void onFailure(int code, final String arg0) {
 							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 								@Override
 								public void run() {

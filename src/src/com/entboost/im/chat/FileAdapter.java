@@ -1,7 +1,8 @@
 package com.entboost.im.chat;
 
 import java.io.File;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -17,10 +18,15 @@ import com.entboost.im.R;
 
 public class FileAdapter extends BaseAdapter{
 
-	private Vector<String> list=new Vector<String>();
+	private List<String> list=new ArrayList<String>();
+	private List<String> selected = new ArrayList<String>();
 	private LayoutInflater mInflater;
 	
-	public void setInput(Vector<String> list){
+	public List<String> getSelected() {
+		return selected;
+	}
+	
+	public void setInput(List<String> list){
 		this.list.clear();
 		this.list.addAll(list);
 	}
@@ -54,16 +60,22 @@ public class FileAdapter extends BaseAdapter{
 			// 减少findView的次数
 			holder = new ViewHolder();
 			// 初始化布局中的元素
-			holder.fileName = ((TextView) convertView
-					.findViewById(R.id.fileName));
-			holder.user_select=((ImageButton) convertView
-					.findViewById(R.id.user_select));
+			holder.fileName = ((TextView) convertView.findViewById(R.id.fileName));
+			holder.user_select=((ImageButton) convertView.findViewById(R.id.user_select));
 			convertView.setTag(holder);
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
+		
 		String fileName=String.valueOf(getItem(position));
 		holder.fileName.setText(StringUtils.substringAfterLast(fileName, File.separator));
+		
+		//判断是否已被选中
+		if (selected.contains(fileName))
+			holder.user_select.setImageResource(R.drawable.uitb_57);
+		else
+			holder.user_select.setImageDrawable(null);
+
 		return convertView;
 	}
 

@@ -29,7 +29,7 @@ public class EditGroupEmailActivity extends EbActivity {
 		EntboostUM.editGroup(depid, null, null, null, null, sGroup_email, null, null, null, groupInfo.getType(), new EditGroupListener() {
 
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

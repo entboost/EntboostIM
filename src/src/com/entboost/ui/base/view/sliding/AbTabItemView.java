@@ -85,6 +85,15 @@ public class AbTabItemView extends RelativeLayout {
 			unReadTextView.setText(String.valueOf(num));
 		}
 	}
+	
+	public void showTip(String formatedNum) {
+		if (formatedNum!=null && formatedNum.length()>0) {
+			unReadTextView.setVisibility(View.VISIBLE);
+			unReadTextView.setText(formatedNum);
+		} else {
+			unReadTextView.setVisibility(View.INVISIBLE);
+		}
+	}
 
 	public void hideTip() {
 		unReadTextView.setVisibility(View.INVISIBLE);

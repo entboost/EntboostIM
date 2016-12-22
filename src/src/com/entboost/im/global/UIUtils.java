@@ -4,10 +4,11 @@ import java.util.List;
 
 import net.yunim.service.constants.EB_RESOURCE_TYPE;
 import net.yunim.service.entity.Resource;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.Dialog;
@@ -17,9 +18,11 @@ import android.app.PendingIntent;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.text.Html;
 import android.text.Html.ImageGetter;
 import android.text.Spannable;
@@ -35,9 +38,9 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -145,17 +148,16 @@ public class UIUtils {
 	/**
 	 * 将表情资源添加到文本编辑框中
 	 * 
+	 * @param res 系统资源对象
 	 * @param mContentEdit
 	 *            文本编辑框
 	 * @param emotions
 	 *            表情资源对象
 	 */
-	public static void addEmotions(EditText mContentEdit,
-			final Resource emotions) {
+	public static void addEmotions(final Resources res, EditText mContentEdit, final Resource emotions) {
 		String newText = emotions.getResourceStr();
 		SpannableString ss = new SpannableString(newText);
-		BitmapDrawable drawable = new BitmapDrawable(
-				ResourceUtils.getResourceBitmap(emotions.getRes_id(),
+		BitmapDrawable drawable = new BitmapDrawable(res, YIResourceUtils.getResourceBitmap(emotions.getRes_id(),
 						EB_RESOURCE_TYPE.EB_RESOURCE_EMOTION.ordinal()));
 		drawable.setBounds(0, 0, 35, 35);// 设置表情图片的显示大小
 		ImageSpan dspan = new ImageSpan(drawable, ImageSpan.ALIGN_BOTTOM);
@@ -165,55 +167,79 @@ public class UIUtils {
 	}
 
 	/**
-	 * android界面展示html代码（包含图片）
+	 * 展示html代码（包含图片）
 	 * 
-	 * @param html
+	 * @param res 系统资源对象
+	 * @param html 消息内容
+	 * @param smallEmotion 表情图标是否以小尺寸显示
 	 * @return
 	 */
-	public static CharSequence getTipCharSequence(String html) {
+	public static CharSequence getTipCharSequence(final Resources res, final String html, final boolean smallEmotion) {
 		if (StringUtils.isBlank(html)) {
 			return "";
 		}
-		html = html.replaceAll("\r\n", "<br/>");
-		html = html.replaceAll("\n", "<br/>");
-		html = html.replaceAll("\r", "<br/>");
-		CharSequence charSequence = Html.fromHtml(html, new ImageGetter() {
+		
+		String newHtml = html.replaceAll("\r\n", "<br/>");
+		newHtml = newHtml.replaceAll("\n", "<br/>");
+		newHtml = newHtml.replaceAll("\r", "<br/>");
+		CharSequence charSequence = Html.fromHtml(newHtml, new ImageGetter() {
 			@Override
 			public Drawable getDrawable(String source) {
-				BitmapDrawable drawable = new BitmapDrawable(ResourceUtils
-						.getResourceBitmap(Long.valueOf(source),
-								EB_RESOURCE_TYPE.EB_RESOURCE_EMOTION.ordinal()));
-				drawable.setBounds(0, 0, 35, 35);// 设置表情图片的显示大小
+				BitmapDrawable drawable = new BitmapDrawable(res, YIResourceUtils.getResourceBitmap(
+						Long.valueOf(source), EB_RESOURCE_TYPE.EB_RESOURCE_EMOTION.ordinal()));
+				
+				int right = 60, bottom = 60;
+				if (smallEmotion)
+					right = bottom =40;
+				
+				drawable.setBounds(0, 0, right, bottom);// 设置表情图片的显示大小
 				return drawable;
 			}
 		}, null);
 		return charSequence;
 	}
-
-	public static CharSequence getTipCharSequence(String html, int length) {
-		CharSequence charSequence = getTipCharSequence(html);
-		if (charSequence.length() > length + 1) {
-			return charSequence.subSequence(0, length) + "...";
-		} else {
-			return charSequence;
-		}
-
-	}
-
-	public static void sendNotificationMsg(Context context, int icon,
-			CharSequence title, CharSequence content, int number,
-			Intent notificationIntent) {
+	
+//	public static CharSequence getTipCharSequence(final Resources res, final String html, final boolean smallEmotion, final int length) {
+//		CharSequence charSequence = getTipCharSequence(res, html, smallEmotion);
+//		if (charSequence.length() > length + 1) {
+//			return charSequence.subSequence(0, length) + "...";
+//		} else {
+//			return charSequence;
+//		}
+//	}
+	
+	//发送通知栏消息
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	public static void sendNotificationMsg(Context context, int icon, CharSequence title, 
+			CharSequence content, int number, Intent notificationIntent) {
 		// 定义NotificationManager
-		NotificationManager mNotificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification mNotification = new Notification(icon, "[" + title + "]"
-				+ content, System.currentTimeMillis());
-		mNotification.defaults = Notification.DEFAULT_SOUND;
+		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		
+		Notification.Builder builder = new Notification.Builder(context);
+		builder.setContentTitle(title);
+		//builder.setContentInfo("");
+		builder.setContentText(content);
+		builder.setSmallIcon(R.drawable.ic_launcher);
+		//builder.setTicker("新消息");
+		//builder.setAutoCancel(true);
+		builder.setWhen(System.currentTimeMillis());
+		builder.setContentIntent(pendingIntent);
+		builder.setDefaults(Notification.DEFAULT_SOUND);
+		
+		//Notification mNotification = new Notification(icon, "[" + title + "]" + content, System.currentTimeMillis());
+		//mNotification.setLatestEventInfo(context, title, content, PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT));
+		//mNotification.defaults = Notification.DEFAULT_SOUND;
+		Notification mNotification = null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			mNotification = builder.build();
+		} else {
+			mNotification = builder.getNotification();
+		}
+		
 		mNotification.flags = Notification.FLAG_AUTO_CANCEL;
-		// 第二个参数是打开通知栏后的标题， 第三个参数是通知内容
-		mNotification.setLatestEventInfo(context, title, content, PendingIntent
-				.getActivity(context, 0, notificationIntent,
-						PendingIntent.FLAG_UPDATE_CURRENT));
+		
 		// if (mNotification.contentView != null) {
 		// AppAccountInfo appInfo = EntboostCache.getAppInfo();
 		// if (appInfo != null && appInfo.getEnt_logo_url() != null) {
@@ -236,6 +262,12 @@ public class UIUtils {
 		mNotificationManager.notify(messageNotificationID, mNotification);
 	}
 
+	//删除通知栏通知
+	public static void cancelNotificationMsg(Context context) {
+		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel(messageNotificationID);
+	}
+	
 	/**
 	 * 实现文本复制功能
 	 * 

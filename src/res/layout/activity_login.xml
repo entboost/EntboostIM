@@ -134,7 +134,7 @@
             android:background="@drawable/btn_style_blue"
             android:padding="10dp"
             android:text="登录"
-            android:textColor="#ffffff"
+            android:textColor="@color/text_color_1"
             android:textSize="16sp" />
     </LinearLayout>
 

@@ -1,7 +1,10 @@
 package com.entboost.im.chat;
 
 import java.io.File;
-import java.util.Vector;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import net.yunim.service.cache.FileCacheUtils;
 
@@ -29,17 +32,18 @@ public class FileListActivity extends EbActivity {
 
 	private ListView listView;
 	private FileAdapter fileAdapter;
-	private Vector<String> selected = new Vector<String>();
+	private List<String> selected;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setAbContentView(R.layout.activity_file_list);
-		
 		listView = (ListView) findViewById(R.id.filelist);
+		
 		fileAdapter = new FileAdapter(this);
 		fileAdapter.setInput(getFileList());
 		listView.setAdapter(fileAdapter);
+		selected = fileAdapter.getSelected();
 		
 		listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 			@Override
@@ -52,11 +56,9 @@ public class FileListActivity extends EbActivity {
 		
 		listView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				String fileName = (String) fileAdapter.getItem(position);
-				ImageView selectImg = (ImageView) view
-						.findViewById(R.id.user_select);
+				ImageView selectImg = (ImageView) view.findViewById(R.id.user_select);
 				Drawable srcImg = selectImg.getDrawable();
 				if (srcImg == null) {
 					selectImg.setImageResource(R.drawable.uitb_57);
@@ -69,25 +71,32 @@ public class FileListActivity extends EbActivity {
 				}
 			}
 		});
+		
 		initMenu();
 	}
 
-	public Vector<String> getFileList() {
-		Vector<String> list = new Vector<String>();
+	public List<String> getFileList() {
+		List<String> list = new ArrayList<String>();
 		File f = new File(FileCacheUtils.getFilePath()); // 打开文件目录
 		File[] files = f.listFiles(); // 获取当前目录中文件列表
 		for (File file : files) {
 			list.add(file.getAbsolutePath());
 		}
+		
+		//排序
+		Collections.sort(list, Collator.getInstance(java.util.Locale.CHINA));
+		
 		return list;
 	}
 
+	//初始化右上角按钮
 	public void initMenu() {
 		PopMenuConfig config = new PopMenuConfig();
 		config.setBackground_resId(R.drawable.popmenu);
 		config.setTextColor(Color.WHITE);
 		config.setShowAsDropDownYoff(28);
-		this.getTitleBar().addRightImageButton(R.drawable.ic_action_save, null, new PopMenuItem(new PopMenuItemOnClickListener() {
+		
+		this.getTitleBar().addRightImageButton(R.drawable.ic_action_delete, null, new PopMenuItem(new PopMenuItemOnClickListener() {
 			@Override
 			public void onItemClick() {
 				if (selected.size() > 0) {
@@ -106,7 +115,6 @@ public class FileListActivity extends EbActivity {
 					showToast("未选择要删除的文件！");
 				}
 			}
-
 		}));
 	}
 

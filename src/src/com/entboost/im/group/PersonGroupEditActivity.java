@@ -39,13 +39,15 @@ public class PersonGroupEditActivity extends EbActivity {
 			pageInfo.showError("群组名称不能为空！");
 			return;
 		}
+		
 		showProgressDialog("正在添加新的个人群组");
 		PersonGroupInfo group =new PersonGroupInfo();
 		group.setDep_name(pgroup_name_str);
 		group.setDescription(pgroup_desc_str);
+		
 		EntboostUM.addPersonGroup(group, new EditGroupListener() {
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

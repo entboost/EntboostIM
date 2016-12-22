@@ -10,7 +10,7 @@ import net.yunim.service.entity.PersonGroupInfo;
 import net.yunim.service.listener.DelMemberListener;
 import net.yunim.service.listener.EditContactListener;
 import net.yunim.service.listener.EditInfoListener;
-import net.yunim.utils.ResourceUtils;
+import net.yunim.utils.YIResourceUtils;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -89,66 +89,80 @@ public class MemberInfoActivity extends EbActivity {
 		// 1、首先根据传入的成员编号获取群组成员对象
 		memberInfo = EntboostCache.getMemberByCode(memberCode);
 		// 2、如果根据传入的成员编号获取群组成员对象为空，那么直接从传入的数据中获取群组成员
-		if (memberInfo == null) {
-			memberInfo = (MemberInfo) getIntent().getSerializableExtra(
-					"memberInfo");
+		if (memberInfo == null)
+			memberInfo = (MemberInfo) getIntent().getSerializableExtra("memberInfo");
+		if (memberInfo == null)
+			return;
+					
+		GroupInfo group = EntboostCache.getGroup(memberInfo.getDep_code());
+		if (group == null)
+			return;
+		
+		// 3、设置成员信息
+		member_account.setText(memberInfo.getEmp_account());
+		member_username.setText(memberInfo.getUsername());
+		member_id.setText(memberInfo.getEmp_uid() + "");
+		member_phone.setText(memberInfo.getWork_phone());
+		member_tel.setText(memberInfo.getCell_phone());
+		member_email.setText(memberInfo.getEmail());
+		
+		member_dep.setText(group.getDep_name());
+		member_job.setText(memberInfo.getJob_title());
+		
+		// 3-1、设置成员头像，如果没有则设置为默认头像
+		Bitmap img = YIResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
+		if (img != null) {
+			member_head.setImageBitmap(img);
+		} else {
+			member_head.setImageResource(R.drawable.default_user);
 		}
-		if (memberInfo != null) {
-			// 3、设置成员信息
-			member_account.setText(memberInfo.getEmp_account());
-			member_username.setText(memberInfo.getUsername());
-			member_id.setText(memberInfo.getEmp_uid() + "");
-			member_phone.setText(memberInfo.getWork_phone());
-			member_tel.setText(memberInfo.getCell_phone());
-			member_email.setText(memberInfo.getEmail());
-			GroupInfo group = EntboostCache.getGroup(memberInfo.getDep_code());
-			if (group != null) {
-				member_dep.setText(group.getDep_name());
-			}
-			member_job.setText(memberInfo.getJob_title());
-			// 3-1、设置成员头像，如果没有则设置为默认头像
-			Bitmap img = ResourceUtils.getHeadBitmap(memberInfo.getH_r_id());
-			if (img != null) {
-				member_head.setImageBitmap(img);
-			} else {
-				member_head.setImageResource(R.drawable.default_user);
-			}
-			// 3-2、判断成员所在的群组是个人群组或部门，区别展示不同的标题，职位是否显示等
-			AbTitleBar titleBar = this.getTitleBar();
+		
+		// 3-2、判断成员所在的群组是个人群组或部门，区别展示不同的标题，职位是否显示等
+		AbTitleBar titleBar = this.getTitleBar();
+		if (group instanceof PersonGroupInfo) {
+			titleBar.setTitleText("群组成员信息");
+			member_job_layout.setVisibility(View.GONE);
+			member_dep_lab.setText("群组");
+		} else if (group instanceof DepartmentInfo) {
+			titleBar.setTitleText("部门成员信息");
+			member_dep_lab.setText("部门");
+			member_job_layout.setVisibility(View.VISIBLE);
+		}
+		if (selfFlag) {
+			// 3-3、如果成员是当前登录用户，隐藏发送消息、添加好友的按钮，显示设置默认名片的按钮，显示不同的退出按钮文字
+			member_set_default.setVisibility(View.VISIBLE);
 			if (group instanceof PersonGroupInfo) {
-				titleBar.setTitleText("群组成员信息");
-				member_job_layout.setVisibility(View.GONE);
-				member_dep_lab.setText("群组");
-			} else if (group instanceof DepartmentInfo) {
-				titleBar.setTitleText("部门成员信息");
-				member_dep_lab.setText("部门");
-				member_job_layout.setVisibility(View.VISIBLE);
-			}
-			if (selfFlag) {
-				// 3-3、如果成员是当前登录用户，隐藏发送消息、添加好友的按钮，显示设置默认名片的按钮，显示不同的退出按钮文字
-				member_set_default.setVisibility(View.VISIBLE);
-				member_del.setVisibility(View.VISIBLE);
-				if (group instanceof PersonGroupInfo) {
+				if (!memberInfo.isCreator()) {
 					member_del.setText("退出群组");
-				} else if (group instanceof DepartmentInfo) {
-					member_del.setText("退出部门");
+					member_del.setVisibility(View.VISIBLE);
 				}
-			} else {
-				// 3-4、如果成员不是当前登录用户，显示发送消息、添加好友的按钮，隐藏设置默认名片的按钮，显示不同的退出按钮文字
-				member_send_btn.setVisibility(View.VISIBLE);
+			} else if (group instanceof DepartmentInfo) {
+				member_del.setVisibility(View.GONE);
+				//member_del.setText("退出部门");
+			}
+		} else {
+			// 3-4、如果成员不是当前登录用户，显示发送消息、添加好友的按钮，隐藏设置默认名片的按钮，显示不同的退出按钮文字
+			member_send_btn.setVisibility(View.VISIBLE);
+			
+			// 判断管理权限
+			Long myUid = EntboostCache.getUid();
+			if (group.getCreate_uid() - myUid == 0 || EntboostCache.getEnterpriseInfo().getCreate_uid() - myUid == 0)
 				member_del.setVisibility(View.VISIBLE);
-				member_del.setText("移除成员");
-				AppAccountInfo appInfo = EntboostCache.getAppInfo();
-				if ((appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) == AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
-					member_add_friend.setVisibility(View.VISIBLE);
-				} else {
-					member_add_contact.setVisibility(View.VISIBLE);
-				}
-				// 3-5、如果成员已经是好友，则隐藏添加好友的按钮
-				if (EntboostUM.isContactMember(memberInfo)) {
-					member_add_contact.setVisibility(View.GONE);
-					member_add_friend.setVisibility(View.GONE);
-				}
+			else
+				member_del.setVisibility(View.GONE);
+			
+			member_del.setText("移除成员");
+			
+			AppAccountInfo appInfo = EntboostCache.getAppInfo();
+			if ((appInfo.getSystem_setting() & AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) == AppAccountInfo.SYSTEM_SETTING_VALUE_AUTH_CONTACT) {
+				member_add_friend.setVisibility(View.VISIBLE);
+			} else {
+				member_add_contact.setVisibility(View.VISIBLE);
+			}
+			// 3-5、如果成员已经是好友，则隐藏添加好友的按钮
+			if (EntboostUM.isContactMember(memberInfo)) {
+				member_add_contact.setVisibility(View.GONE);
+				member_add_friend.setVisibility(View.GONE);
 			}
 		}
 	}
@@ -173,7 +187,7 @@ public class MemberInfoActivity extends EbActivity {
 			EntboostUM.addContact(memberInfo, memberInfo.getDescription(), new EditContactListener() {
 
 				@Override
-				public void onFailure(final String errMsg) {
+				public void onFailure(int code, final String errMsg) {
 					HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 						@Override
 						public void run() {
@@ -209,7 +223,7 @@ public class MemberInfoActivity extends EbActivity {
 					showProgressDialog("正在加为好友！");
 					EntboostUM.addContact(memberInfo, value, new EditContactListener() {
 								@Override
-								public void onFailure(final String errMsg) {
+								public void onFailure(int code, final String errMsg) {
 									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
 										public void run() {
@@ -262,7 +276,7 @@ public class MemberInfoActivity extends EbActivity {
 					showProgressDialog(progressMsg);
 					EntboostUM.delGroupMember(memberInfo.getEmp_code(), new DelMemberListener() {
 						@Override
-						public void onFailure(final String errMsg) {
+						public void onFailure(int code, final String errMsg) {
 							HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 								@Override
 								public void run() {
@@ -304,7 +318,7 @@ public class MemberInfoActivity extends EbActivity {
 		EntboostUM.setMyDefaultMemberCode(memberCode, new EditInfoListener() {
 
 			@Override
-			public void onFailure(final String errMsg) {
+			public void onFailure(int code, final String errMsg) {
 				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 					@Override
 					public void run() {

@@ -3,21 +3,25 @@ package com.entboost.im.chat;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.yunim.service.EntboostCM;
 import net.yunim.service.EntboostCache;
-import net.yunim.service.api.UserCenter;
 import net.yunim.service.cache.EbCache;
 import net.yunim.service.cache.FileCacheUtils;
 import net.yunim.service.entity.AppAccountInfo;
 import net.yunim.service.entity.ChatRoomRichMsg;
 import net.yunim.service.entity.FileCache;
+import net.yunim.service.entity.FuncInfo;
 import net.yunim.service.entity.Resource;
 import net.yunim.service.listener.CallUserListener;
+import net.yunim.service.listener.SendFileListener;
+import net.yunim.utils.YINetworkUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -25,11 +29,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -47,20 +53,22 @@ import com.entboost.im.MainActivity;
 import com.entboost.im.R;
 import com.entboost.im.base.EbActivity;
 import com.entboost.im.contact.DefaultUserInfoActivity;
+import com.entboost.im.function.FunctionMainActivity;
 import com.entboost.im.global.OtherUtils;
 import com.entboost.im.global.UIUtils;
 import com.entboost.im.group.MemberListActivity;
 import com.entboost.im.group.MemberSelectActivity;
 import com.entboost.ui.base.activity.MyActivityManager;
+import com.entboost.ui.base.listener.KeyboardChangeListener;
+import com.entboost.ui.base.listener.KeyboardChangeListener.KeyBoardListener;
 import com.entboost.ui.base.view.popmenu.PopMenu;
 import com.entboost.ui.base.view.popmenu.PopMenuItem;
 import com.entboost.ui.base.view.popmenu.PopMenuItemOnClickListener;
 import com.entboost.ui.base.view.titlebar.AbTitleBar;
-import com.entboost.utils.NetworkUtils;
 import com.entboost.voice.ExtAudioRecorder;
 import com.entboost.voice.VoiceCallback;
 
-public class ChatActivity extends EbActivity {
+public class ChatActivity extends EbActivity implements KeyBoardListener{
 
 	/** The tag. */
 	private static String LONG_TAG = ChatActivity.class.getName();
@@ -88,7 +96,10 @@ public class ChatActivity extends EbActivity {
 	private LinearLayout morePanel;
 	private ImageButton moreBtn;
 	private Button fileBtn;
-
+	
+	//键盘弹出/隐藏事件监听器
+	private KeyboardChangeListener mKeyboardChangeListener;
+	
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		super.onConfigurationChanged(newConfig);
@@ -116,29 +127,30 @@ public class ChatActivity extends EbActivity {
 				//EntboostCache.readMsg(msg.getDepCode());
 				EntboostCache.markReadDynamicNewsBySender(msg.getDepCode());
 			} else {
-				pageInfo.showInfo(msg.getSendName() + "[" + msg.getDepName()+ "]:" + UIUtils.getTipCharSequence(msg.getTipHtml()), 5);
+				pageInfo.showInfo(msg.getSendName() + "[" + msg.getDepName()+ "]:" + UIUtils.getTipCharSequence(getResources(), msg.getTipHtml(), true), 5);
 			}
 		} else {
 			if (msg.getSender() - uid == 0 || msg.getSender() - EntboostCache.getUid() == 0) {
-				//EntboostCache.readMsg(msg.getSender());
 				EntboostCache.markReadDynamicNewsBySender(msg.getSender());
 			} else {
-				pageInfo.showInfo(msg.getSendName() + ":" + UIUtils.getTipCharSequence(msg.getTipHtml()), 5);
+				pageInfo.showInfo(msg.getSendName() + ":" + UIUtils.getTipCharSequence(getResources(), msg.getTipHtml(), true), 5);
 			}
 		}
-		refreshPage();
+		refreshPage(true);
 	}
 
 	/**
 	 * 刷新会话页面
+	 * @param srcollToBottom 是否滚动到视图底部
 	 */
-	private void refreshPage() {
+	private void refreshPage(boolean srcollToBottom) {
 		if (uid != null) {
 			mChatMsgViewAdapter.initChat(EntboostCache.getChatMsgs(uid));
 		}
 		mChatMsgViewAdapter.notifyDataSetChanged();
-		mMsgListView.setAdapter(mChatMsgViewAdapter);
-		mMsgListView.setSelection(mMsgListView.getBottom());
+		//mMsgListView.setAdapter(mChatMsgViewAdapter);
+		if (srcollToBottom)
+			mMsgListView.setSelection(mMsgListView.getBottom());
 	}
 
 	/**
@@ -146,13 +158,7 @@ public class ChatActivity extends EbActivity {
 	 */
 	@Override
 	public void onSendStatusChanged(ChatRoomRichMsg msg) {
-		//在主线程异步执行刷新视图
-		HandlerToolKit.runOnMainThreadAsync(new Runnable() {
-			@Override
-			public void run() {
-				refreshPage();
-			}
-		});
+		refreshPage(true);
 	}
 
 	//处理服务异常和未登陆状态
@@ -187,8 +193,11 @@ public class ChatActivity extends EbActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		setAbContentView(R.layout.activity_chat);
+		
+		//键盘弹出/隐藏事件监听器
+        mKeyboardChangeListener = new KeyboardChangeListener(this);
+        mKeyboardChangeListener.setKeyBoardListener(this);
 		
 		AbTitleBar titleBar = this.getTitleBar();
 		title = this.getIntent().getStringExtra(INTENT_TITLE);
@@ -227,7 +236,7 @@ public class ChatActivity extends EbActivity {
 						public void onClick(DialogInterface dialog, int which) {
 							EntboostCM.call2Group(uid, new CallUserListener() {
 								@Override
-								public void onFailure(final String errMsg) {
+								public void onFailure(int code, final String errMsg) {
 									HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 										@Override
 										public void run() {
@@ -257,6 +266,10 @@ public class ChatActivity extends EbActivity {
 										}
 									});
 								}
+
+								@Override
+								public void onChatEntered() {
+								}
 							});
 						}
 					});
@@ -273,6 +286,24 @@ public class ChatActivity extends EbActivity {
 					startActivity(intent);
 				}
 			}));
+			
+			// 增加右上角查看共享文件列表按钮
+			final FuncInfo funcInfo = EntboostCache.getGroupFilesFuncInfo();
+			if (funcInfo!=null) {
+				this.getTitleBar().addRightImageButton(R.drawable.uitb_61, null, new PopMenuItem(new PopMenuItemOnClickListener() {
+					@Override
+					public void onItemClick() {
+						Intent intent = new Intent(ChatActivity.this, FunctionMainActivity.class);
+						intent.putExtra("funcInfo", funcInfo);
+						
+						LinkedHashMap<String, Object> eParams = new LinkedHashMap<String, Object>();
+						eParams.put("gid", uid);
+						intent.putExtra("eParams", eParams);
+						
+						startActivityForResult(intent, 5);
+					}
+				}));
+			}
 		}
 		
 		// 增加右上角漫游消息的按钮
@@ -366,8 +397,13 @@ public class ChatActivity extends EbActivity {
 						EntboostCM.sendGroupVoice(uid, recorder.getFilePath());
 				}
 				
-				//刷新界面，待定：可能需要解决在主线程执行
-				refreshPage();
+				//在主线程执行
+				HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+					@Override
+					public void run() {
+						refreshPage(true); //刷新界面
+					}
+				});
 			}
 
 			@Override
@@ -378,7 +414,7 @@ public class ChatActivity extends EbActivity {
 					if (recorder != null)
 						recorder.stopRecord();
 					
-					if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
+					if (!YINetworkUtils.isNetworkConnected(ChatActivity.this)) {
 						pageInfo.showError(ChatActivity.this.getString(R.string.msg_error_localNoNetwork));
 						return false;
 					}
@@ -408,7 +444,10 @@ public class ChatActivity extends EbActivity {
 					voiceImg.setVisibility(View.VISIBLE);
 					
 					Log4jLog.d(LONG_TAG, "going to start record, time="+System.currentTimeMillis());
-					recorder = EntboostCM.startRecording(callback);
+					
+					recorder = ExtAudioRecorder.getInstance(false, callback);
+					String filePath = System.currentTimeMillis() + ".wav";
+					recorder.recordChat(FileCacheUtils.getChatVoicePath(), filePath);
 					
 					voiceSendBtn.setText("松开发送");
 				}
@@ -453,6 +492,10 @@ public class ChatActivity extends EbActivity {
 				contentLayout.setVisibility(View.GONE);
 				voiceBtn.setVisibility(View.GONE);
 				keyBtn.setVisibility(View.VISIBLE);
+				
+				hidSoftInput(); //隐藏软键盘
+				emotionsAppPanel.setVisibility(View.GONE); //隐藏表情输入选择视图
+				morePanel.setVisibility(View.GONE); //隐藏"更多"面板
 			}
 		});
 		
@@ -480,9 +523,11 @@ public class ChatActivity extends EbActivity {
 			@Override
 			public void afterTextChanged(Editable s) {
 				if (s.length() > 0) {
+					//显示"发送"按钮
 					sendBtn.setVisibility(View.VISIBLE);
 					moreBtn.setVisibility(View.GONE);
 				} else {
+					//隐藏"发送"按钮
 					sendBtn.setVisibility(View.GONE);
 					moreBtn.setVisibility(View.VISIBLE);
 				}
@@ -498,7 +543,7 @@ public class ChatActivity extends EbActivity {
 					UIUtils.showToast(ChatActivity.this, "不能发送空消息！");
 					return;
 				}
-				if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
+				if (!YINetworkUtils.isNetworkConnected(ChatActivity.this)) {
 					pageInfo.showError(ChatActivity.this.getString(R.string.msg_error_localNoNetwork));
 					return;
 				}
@@ -513,10 +558,12 @@ public class ChatActivity extends EbActivity {
 						EntboostCM.sendGroupText(uid, text);
 					}
 				}
-				refreshPage();
+				
 				// 清空文本框
 				mContentEdit.setText("");
 				mMsgListView.setSelection(mMsgListView.getBottom());
+				// 隐藏表情输入视图
+				emotionsAppPanel.setVisibility(View.GONE);
 				// View view = getWindow().peekDecorView();
 				// if (view != null) {
 				// InputMethodManager inputmanger = (InputMethodManager)
@@ -524,18 +571,28 @@ public class ChatActivity extends EbActivity {
 				// inputmanger.hideSoftInputFromWindow(view.getWindowToken(),
 				// 0);
 				// }
+				
+				//延时刷新聊天视图
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						refreshPage(true);
+					}
+				}, 100);
 			}
 		});
 
 		//聊天消息列表
 		mMsgListView = (ListView) this.findViewById(R.id.mListView);
 		mChatMsgViewAdapter = new ChatMsgViewAdapter(ChatActivity.this, EntboostCache.getChatMsgs(uid));
+		mChatMsgViewAdapter.setChatActivity(this);
 		mMsgListView.setAdapter(mChatMsgViewAdapter);
 		mMsgListView.setSelection(mChatMsgViewAdapter.getCount() - 1); //滚动到最后一条记录
 		
 		//长按消息弹出菜单
 		final PopMenu popMenu = new PopMenu(this);
 		mChatMsgViewAdapter.setPopMenu(popMenu);
+		
 		//定义子菜单项
 		List<PopMenuItem> popMenuItems = new ArrayList<PopMenuItem>();
 		//"复制"菜单项
@@ -548,6 +605,7 @@ public class ChatActivity extends EbActivity {
 			}
 		});
 		popMenuItems.add(item1);
+		
 		//"转发"菜单项
 		PopMenuItem item2 = new PopMenuItem("转  发", 0, R.layout.item_menu, new PopMenuItemOnClickListener() {
 			@Override
@@ -562,7 +620,7 @@ public class ChatActivity extends EbActivity {
 				
 				//把当前用户在选择界面除外
 				List<Long> excludeUids = new ArrayList<Long>();
-				excludeUids.add(UserCenter.getInstance().getUserid()); //当前登录用户编号
+				excludeUids.add(EntboostCache.getUid()); //当前登录用户编号
 				excludeUids.add(ChatActivity.this.uid); //当前一对一聊天界面的对方用户编号
 				intent.putExtra("excludeUids", (Serializable)excludeUids);
 				
@@ -572,6 +630,19 @@ public class ChatActivity extends EbActivity {
 		popMenuItems.add(item2);
 		mChatMsgViewAdapter.setPopMenuItems(popMenuItems);
 		
+		//"删除"菜单项
+		PopMenuItem item3 = new PopMenuItem("删  除", 0, R.layout.item_menu, new PopMenuItemOnClickListener() {
+			@Override
+			public void onItemClick() {
+				popMenu.dismiss();
+				
+				ChatRoomRichMsg msg = (ChatRoomRichMsg) popMenu.getObj();
+				EntboostCM.deleteChatMsgById(msg.getId());
+				refreshPage(false);
+			}
+		});
+		popMenuItems.add(item3);
+		mChatMsgViewAdapter.setPopMenuItems(popMenuItems);		
 		
 		//表情输入选择区域
 		expressionGriView = (GridView) this.findViewById(R.id.expressionGridView);
@@ -581,8 +652,8 @@ public class ChatActivity extends EbActivity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				final Resource emotions = (Resource) emotionsImageAdapter.getItem(position);
-				UIUtils.addEmotions(mContentEdit, emotions);
-				emotionsAppPanel.setVisibility(View.GONE);
+				UIUtils.addEmotions(ChatActivity.this.getResources(), mContentEdit, emotions);
+				//emotionsAppPanel.setVisibility(View.GONE);
 			}
 		});
 		emotionsAppPanel = (LinearLayout) this.findViewById(R.id.expressionAppPanel);
@@ -592,9 +663,8 @@ public class ChatActivity extends EbActivity {
 		picBtn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
-					pageInfo.showError(ChatActivity.this
-							.getString(R.string.msg_error_localNoNetwork));
+				if (!YINetworkUtils.isNetworkConnected(ChatActivity.this)) {
+					pageInfo.showError(ChatActivity.this.getString(R.string.msg_error_localNoNetwork));
 					return;
 				}
 				getPicFromContent();
@@ -607,7 +677,14 @@ public class ChatActivity extends EbActivity {
 			@Override
 			public void onClick(View v) {
 				if (emotionsAppPanel.getVisibility() == View.GONE) {
-					emotionsAppPanel.setVisibility(View.VISIBLE);
+					hidSoftInput(); //隐藏软键盘
+					morePanel.setVisibility(View.GONE); //隐藏"更多"面板
+					new Handler().postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							emotionsAppPanel.setVisibility(View.VISIBLE); //显示表情输入选择视图
+						}
+					}, 150);
 				} else {
 					emotionsAppPanel.setVisibility(View.GONE);
 				}
@@ -620,9 +697,11 @@ public class ChatActivity extends EbActivity {
 		moreBtn = (ImageButton) this.findViewById(R.id.moreBtn);
 		moreBtn.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(View v) {
 				if (morePanel.getVisibility() == View.GONE) {
-					morePanel.setVisibility(View.VISIBLE);
+					hidSoftInput();	//隐藏软键盘
+					emotionsAppPanel.setVisibility(View.GONE); //隐藏表情输入选择视图
+					morePanel.setVisibility(View.VISIBLE); //显示"更多"面板
 				} else {
 					morePanel.setVisibility(View.GONE);
 				}
@@ -631,13 +710,13 @@ public class ChatActivity extends EbActivity {
 		
 		//“选取待发送文件”按钮
 		fileBtn = (Button) this.findViewById(R.id.fileBtn);
-		if (chattype == CHATTYPE_PERSON) {
+		final FuncInfo funcInfo = EntboostCache.getGroupFilesFuncInfo();
+		if (chattype == CHATTYPE_PERSON || (chattype == CHATTYPE_GROUP && funcInfo!=null)) {
 			fileBtn.setVisibility(View.VISIBLE);
 			fileBtn.setOnClickListener(new OnClickListener() {
-
 				@Override
 				public void onClick(View arg0) {
-					if (!NetworkUtils.isNetworkConnected(ChatActivity.this)) {
+					if (!YINetworkUtils.isNetworkConnected(ChatActivity.this)) {
 						pageInfo.showError(ChatActivity.this.getString(R.string.msg_error_localNoNetwork));
 						return;
 					}
@@ -663,6 +742,23 @@ public class ChatActivity extends EbActivity {
 		}
 	}
 
+    @Override
+    public void onKeyboardChange(boolean isShow, int keyboardHeight) {
+        //Log4jLog.d(LONG_TAG, "onKeyboardChange() called with: " + "isShow = [" + isShow + "], keyboardHeight = [" + keyboardHeight + "]");
+    	if (isShow) { //键盘弹出
+    		morePanel.setVisibility(View.GONE);			//隐藏"更多"的内容面板
+    		emotionsAppPanel.setVisibility(View.GONE);	//隐藏表情输入选择视图
+    	} else { //键盘隐藏
+    		
+    	}
+    }
+	
+    //隐藏软键盘
+    private void hidSoftInput() {
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);   
+        imm.hideSoftInputFromWindow(mContentEdit.getWindowToken(),0);  
+    }
+    
 	private void getFileFromContent() {
 		Intent intent = new Intent();
 		intent.setAction(android.content.Intent.ACTION_GET_CONTENT);
@@ -818,9 +914,22 @@ public class ChatActivity extends EbActivity {
 				sendFile(filePath);
 			}
 			break;
+		case 5: //群共享文件
+			long resId = data.getLongExtra("resId", 0);
+			int dlType = data.getIntExtra("dlType", -1);
+			
+			if (dlType==1 && resId>0) {
+				EntboostCM.receiveGroupFile(resId, this.uid);
+			}
+			
+			break;
 		}
 	}
 
+	/**
+	 * 发送图片
+	 * @param picUri 图片文件绝对路径
+	 */
 	public void sendPic(String picUri) {
 		if (uid < 0) {
 			pageInfo.showError(ChatActivity.this.getString(R.string.msg_send_uiderror));
@@ -833,9 +942,22 @@ public class ChatActivity extends EbActivity {
 				EntboostCM.sendGroupPic(uid, picUri);
 			}
 		}
-		refreshPage();
+		
+		//隐藏“更多”工具栏
+		morePanel.setVisibility(View.GONE);
+		//延时刷新聊天视图
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				refreshPage(true);
+			}
+		}, 500);
 	}
-
+	
+	/**
+	 * 发送文件
+	 * @param filePath 文件绝对路径
+	 */
 	public void sendFile(String filePath) {
 		if (uid < 0) {
 			pageInfo.showError(ChatActivity.this.getString(R.string.msg_send_uiderror));
@@ -845,10 +967,37 @@ public class ChatActivity extends EbActivity {
 			if (chattype == CHATTYPE_PERSON) {
 				EntboostCM.sendFile(uid, filePath);
 			} else {
-
+				//上传群共享文件
+				EntboostCM.uploadGroupFile(uid, filePath, new SendFileListener() {
+					@Override
+					public void onOverMaxPermit() {
+						//在主线程异步执行
+						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
+							@Override
+							public void run() {
+								showToast("文件超过最大限制");;
+							}
+						});
+					}
+					
+					@Override
+					public void onFailure(final int code, String errMsg) {
+					}
+					@Override
+					public void onStart(long msg_id) {
+					}
+				});
 			}
 		}
+		
+		//隐藏“更多”工具栏
 		morePanel.setVisibility(View.GONE);
-		refreshPage();
+		//延时刷新聊天视图
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				refreshPage(true);
+			}
+		}, 1000);
 	}
 }

@@ -30,7 +30,7 @@ public class EditGroupAddrActivity extends EbActivity {
 				sGroup_addr, null,groupInfo.getType(),  new EditGroupListener() {
 
 					@Override
-					public void onFailure(final String errMsg) {
+					public void onFailure(int code, final String errMsg) {
 						HandlerToolKit.runOnMainThreadAsync(new Runnable() {
 							@Override
 							public void run() {
