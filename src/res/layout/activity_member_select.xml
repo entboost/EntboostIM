@@ -1,0 +1,248 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/bg_p"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/selected_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bottom_line1"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <com.entboost.ui.base.view.hlistview.HorizontalListView
+            android:id="@+id/selectedUser"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="1"
+            android:background="@drawable/all_line"
+            android:gravity="center_vertical"
+            android:padding="2dp" >
+        </com.entboost.ui.base.view.hlistview.HorizontalListView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" >
+	             <TextView
+	                android:layout_width="wrap_content"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="left"
+	                android:text="人数 "
+	                android:textColor="@color/text_color_2"
+	                android:textSize="12sp" />
+	             
+	             <TextView
+	                android:id="@+id/selected_count"
+	                android:layout_width="25dp"
+	                android:layout_height="wrap_content"
+	                android:layout_gravity="left"
+	                android:text="0"
+	                android:textColor="@color/text_color_2"
+	                android:textSize="12sp" />
+            </LinearLayout>
+         	
+	        <Button
+	            android:id="@+id/selectedBtn"
+	            android:layout_width="45dp"
+	            android:layout_height="40dp"
+	            android:layout_marginTop = "2dp"
+	            android:background="@drawable/btn_style_blue"
+	            android:text="确定"
+	            android:textColor="@color/text_color_1"
+	            android:textSize="18sp" >
+	        </Button>
+	        
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:baselineAligned="false"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/layout_department"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:id="@+id/btn_department"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/f1" />
+
+            <TextView
+                android:id="@+id/text_department"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="我的部门"
+                android:textColor="@color/text_color_2"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_contact2"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:id="@+id/btn_contact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/f2" />
+
+            <TextView
+                android:id="@+id/text_contact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="通讯录"
+                android:textColor="@color/text_color_2"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_group2"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@drawable/bottom_line_green"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:id="@+id/btn_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/f3" />
+
+            <TextView
+                android:id="@+id/text_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="个人群组"
+                android:textColor="@color/text_color_2"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_ent"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:id="@+id/btn_ent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="5dp"
+                android:src="@drawable/f4" />
+
+            <TextView
+                android:id="@+id/text_ent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="企业架构"
+                android:textColor="@color/text_color_2"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/bottom_top_line"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/text_listname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:text="联系人分组"
+            android:textColor="#666"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <ExpandableListView
+        android:id="@+id/friendlist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:cacheColorHint="#00000000"
+        android:divider="@color/listdivider"
+        android:dividerHeight="1px"
+        android:fastScrollEnabled="false"
+        android:groupIndicator="@null" >
+    </ExpandableListView>
+
+    <ExpandableListView
+        android:id="@+id/grouplist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:cacheColorHint="#00000000"
+        android:divider="@color/listdivider"
+        android:dividerHeight="1px"
+        android:fastScrollEnabled="false"
+        android:groupIndicator="@null"
+        android:visibility="gone" >
+    </ExpandableListView>
+
+    <ExpandableListView
+        android:id="@+id/departmentlist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:cacheColorHint="#00000000"
+        android:divider="@color/listdivider"
+        android:dividerHeight="1px"
+        android:fastScrollEnabled="false"
+        android:groupIndicator="@null"
+        android:visibility="gone" >
+    </ExpandableListView>
+
+    <ExpandableListView
+        android:id="@+id/entlist"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:cacheColorHint="#00000000"
+        android:divider="@color/listdivider"
+        android:dividerHeight="1px"
+        android:fastScrollEnabled="false"
+        android:groupIndicator="@null"
+        android:visibility="gone" >
+    </ExpandableListView>
+
+</LinearLayout>
