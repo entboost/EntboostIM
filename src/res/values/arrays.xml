@@ -1,0 +1,8 @@
+<resources>
+    <string-array name="group_type">
+        <item>[企业部门]</item>
+        <item>[项目组]</item>
+        <item>[个人群组]</item>
+        <item>[临时讨论组]</item>
+    </string-array>
+</resources>

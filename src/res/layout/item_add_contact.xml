@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_add_contact_layout"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:background="@drawable/mm_listitem"
+    android:gravity="center_vertical" 
+    android:visibility="gone">
+
+    <ImageView
+        android:id="@+id/avatar"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_alignParentLeft="true"
+        android:padding="5dp"
+        android:layout_marginLeft="4dp"
+        android:src="@drawable/add_btn" />
+
+    <TextView
+        android:id="@+id/item_add_contact_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="7dp"
+        android:layout_toRightOf="@id/avatar"
+        android:text="新建联系人"
+        android:textColor="#0F0F0F"
+        android:textSize="20sp" />
+
+</RelativeLayout>

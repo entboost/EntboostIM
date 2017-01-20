@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/mainPageBG"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" 
+    >
+
+    <RelativeLayout
+        android:id="@+id/pgroup_name_layout"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginLeft="28dp"
+        android:layout_marginRight="28dp"
+        android:layout_marginTop="25dp" >
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/all_line" />
+
+        <ImageView
+            android:id="@+id/login_user_img"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/account" />
+
+        <EditText
+            android:id="@+id/pgroup_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="11dp"
+            android:layout_toRightOf="@id/login_user_img"
+            android:background="@null"
+            android:hint="群组名称"
+            android:textColor="@color/text_color_2"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            android:textSize="16sp" />
+    </RelativeLayout>
+	
+   <EditText
+        android:id="@+id/pgroup_desc"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/pgroup_name_layout"
+        android:layout_marginLeft="28dp"
+        android:layout_marginRight="28dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/all_line"
+        android:ems="10"
+        android:textColor="@color/text_color_2"
+        android:hint="备注"
+        android:textSize="16sp"
+        android:inputType="textMultiLine" >
+
+    </EditText>
+
+    <Button
+        android:id="@+id/pgroup_add_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/pgroup_desc"
+        android:layout_alignRight="@+id/pgroup_desc"
+        android:layout_below="@+id/pgroup_desc"
+        android:layout_marginTop="17dp"
+        android:background="@drawable/btn_style_green1"
+        android:text="保存"
+        android:padding="12dp"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <Button
+        android:id="@+id/pgroup_cancel_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/pgroup_desc"
+        android:layout_alignRight="@+id/pgroup_desc"
+        android:layout_below="@+id/pgroup_add_btn"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/btn_style_w"
+        android:text="取消"
+        android:padding="12dp"
+        android:textColor="@drawable/btn_text_color_2"
+        android:textSize="16sp" />
+
+</RelativeLayout>
