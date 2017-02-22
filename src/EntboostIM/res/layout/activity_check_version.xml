@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mainPageBG"
+    android:orientation="vertical" >
+    
+    <RelativeLayout
+        android:id="@+id/s1_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop = "25sp"
+        android:background="@drawable/bottom_top_line1"
+        android:clickable="false"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:id="@+id/s1_lab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:padding="8dp"
+            android:text="检查本应用版本"
+            android:textColor="@color/text_color_2"
+            android:textSize="16sp" />
+    </RelativeLayout>
+    
+    <RelativeLayout
+        android:id="@+id/s2_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop = "10sp"
+        android:background="@drawable/bottom_top_line1"
+        android:clickable="false"
+        android:gravity="center_vertical" >
+
+        <TextView
+            android:id="@+id/s2_lab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="8dp"
+            android:padding="8dp"
+            android:text="允许安装升级华为推送服务"
+            android:textColor="@color/text_color_2"
+            android:textSize="16sp" />
+
+        <com.entboost.im.ui.SegmentedRadioGroup
+            android:id="@+id/s2_segment_text"
+            android:tag = "1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="8dp"
+            android:checkedButton="@+id/s1_open"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal" >
+	
+            <RadioButton
+                android:id="@+id/s2_open"
+                android:button="@null"
+                android:gravity="center"
+                android:minHeight="28dip"
+                android:minWidth="40dip"
+                android:text="开"
+                android:tag="true"
+                android:textColor="@drawable/segment_radio_text"
+                android:textSize="12sp" />
+	
+            <RadioButton
+                android:id="@+id/s2_close"
+                android:button="@null"
+                android:gravity="center"
+                android:minHeight="28dip"
+                android:minWidth="40dip"
+                android:text="关"
+                android:tag="false"
+                android:textColor="@drawable/segment_radio_text"
+                android:textSize="12sp" />
+        </com.entboost.im.ui.SegmentedRadioGroup>
+    </RelativeLayout>    
+</LinearLayout>

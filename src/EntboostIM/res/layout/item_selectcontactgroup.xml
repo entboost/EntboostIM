@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:descendantFocusability= "blocksDescendants"
+    android:background="@drawable/mm_listitem" >
+    
+    <ImageButton
+        android:id="@+id/user_select"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:scaleType="fitXY"
+        android:focusable = "false"
+        android:background="@drawable/circleradio"/>
+
+    <ImageView
+        android:id="@+id/user_head"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_toRightOf="@id/user_select"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/group_head_0" />
+
+    <TextView
+        android:id="@+id/user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/user_head"
+        android:layout_marginLeft="10dp"
+        android:textColor="@color/text_color_2"
+        android:textSize="18sp" />
+
+</RelativeLayout>
