@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">恩布互联</string>
+    <string name="loginTitle">恩布互联-登录</string>
+    <string name="title_activity_main">恩布互联</string>
+    <string name="title_activity_register">注册</string>
+    <string name="title_activity_user_info">个人信息</string>
+    <string name="title_activity_info_name_edit">用户名称修改</string>
+    <string name="title_activity_info_description_edit">修改个人备注信息</string>
+    <string name="title_activity_contact_info">联系人资料</string>
+    <string name="title_activity_setting">SettingActivity</string>
+    <string name="title_activity_change_pwd">修改密码</string>
+    <string name="register_activity_serverhref"><a href="www.entboost.com">《恩布互联服务许可协议》</a></string>
+    <string name="title_activity_contact_text_edit">编辑文本</string>
+    <string name="title_activity_contact_description">联系人备注修改</string>
+    <string name="title_activity_department">企业组织结构</string>
+    <string name="title_activity_department_info">群组信息</string>
+    <string name="title_activity_member_info">部门成员信息</string>
+    <string name="title_activity_persongroup">个人群组</string>
+    <string name="title_activity_persongroup_info">个人群组信息</string>
+    <string name="title_activity_person_info">群组成员信息</string>
+    <string name="title_activity_welcome">恩布互联</string>
+    <string name="msg_error_send">消息未发送成功</string>
+    <string name="msg_error_disConnect">网络失去连接，正在尝试重新连接！</string>
+    <string name="msg_error_localNoNetwork">网络无法连接，请检查设置！</string>
+    <string name="msg_error_serviceNoNetwork">服务器无法连接，请检查设置！</string>
+    <string name="msg_error_serviceStop">服务器正在维护状态，成功后会自动登录！</string>
+    <string name="msg_send_uiderror">用户ID传入错误，不能发送消息！</string>
+    <string name="title_activity_search_contact">查找</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_call_list">会话请求列表</string>
+    <string name="title_activity_add_contact">添加联系人</string>
+    <string name="title_activity_contact_group">联系人分组</string>
+    <string name="title_activity_set_logon_service_addr">设置服务器地址</string>
+    <string name="title_activity_select_head_img">选择头像</string>
+    <string name="title_activity_member_list">成员列表</string>
+    <string name="title_activity_function_main">FunctionMainActivity</string>
+    <string name="title_activity_default_user_info">个人名片</string>
+    <string name="version_name">恩布互联</string>
+    <string name="title_activity_broadcast_message_list">广播消息</string>
+    <string name="title_activity_broadcast_detail">广播消息</string>
+    <string name="title_activity_onlie_chat_msg">漫游消息</string>
+    <string name="title_activity_person_group_edit">个人群组</string>
+    <string name="title_activity_person_group_select">选择个人群组</string>
+    <string name="title_activity_member_select">选择成员</string>
+    <string name="title_activity_select_contact_group">管理分组</string>
+    <string name="title_activity_department_list">DepartmentListActivity</string>
+    <string name="title_activity_file_list">文件目录</string>
+    <string name="title_activity_forbid_minutes_list">禁言限制</string>
+    <string name="title_activity_app_ver">版本信息</string>
+    <string name="title_activity_notification_setting">通知提醒设置</string>
+    <string name="title_activity_edit_group_name">编辑名称</string>
+    <string name="title_activity_edit_group_tel_activity">修改电话</string>
+    <string name="title_activity_edit_group_fax">修改传真</string>
+    <string name="title_activity_edit_group_email">修改邮箱</string>
+    <string name="title_activity_edit_group_home">修改主页</string>
+    <string name="title_activity_edit_group_addr">修改地址</string>
+    <string name="title_activity_fullscreen_image">FullscreenImageActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_full_image">FullImageActivity</string>
+    <string name="title_activity_info_url_edit">主页</string>
+    <string name="title_activity_info_zipcode_edit">邮编</string>
+    <string name="title_activity_info_tel_edit">联系电话</string>
+    <string name="title_activity_info_mobile_edit">手机号码</string>
+    <string name="title_activity_info_email_edit">邮箱地址</string>
+    <string name="title_activity_info_addr_edit">详细地址</string>
+    <string name="title_activity_info_huawei_resolve_error">华为移动服务</string>
+    <string name="title_activity_info_check_version">检查版本</string>
+    <string name="title_activity_info_security_setting">隐私与安全</string>
+
+    <!-- 华为Push 消息成功率统计： 通道将消息转发给SDK后，SDK通知通道消息已接收到 -->
+    <string name="hwpush_ability_value" translatable="false">successRateAnalytics</string>
+    
+</resources>

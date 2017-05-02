@@ -1,0 +1,18 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+     <ListView
+         android:id="@+id/forbid_minutes_list"
+         android:layout_width="fill_parent"
+         android:layout_height="fill_parent"
+         android:background="@color/bg_p"
+         android:cacheColorHint="#00000000"
+         android:divider="@color/listdivider"
+         android:dividerHeight="1px"
+         android:fastScrollEnabled="true" >
+
+    </ListView>
+
+</RelativeLayout>

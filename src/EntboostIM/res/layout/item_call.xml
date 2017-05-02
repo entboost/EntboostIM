@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/list_item_layout"
+        android:layout_width="match_parent"
+        android:layout_height="59dp"
+        android:background="@drawable/mm_listitem"
+        android:gravity="center_vertical" >
+
+        <RelativeLayout
+            android:id="@+id/call_container"
+            android:layout_width="59dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true" >
+
+            <ImageView
+                android:id="@+id/call_head"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/default_user" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/call_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="6dp"
+            android:layout_toRightOf="@id/call_container"
+            android:text="远方的呼唤"
+            android:textColor="#194e62"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/call_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_toRightOf="@id/call_container"
+            android:ellipsize="end"
+            android:padding="7dp"
+            android:singleLine="true"
+            android:text="一小时前来自外部企业"
+            android:textColor="#60b1ce"
+            android:textSize="12sp" />
+
+        <ImageButton
+            android:id="@+id/call_temp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="7dp"
+            android:background="@drawable/red_line"
+            android:src="@android:drawable/stat_notify_chat"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/call_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/call_name"
+            android:layout_alignBottom="@+id/call_name"
+            android:layout_toRightOf="@+id/call_name"
+            android:layout_marginLeft="10dp"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/orange" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/call_btns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#d4f4ff"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:visibility="gone" >
+
+        <Button
+            android:id="@+id/call_info"
+            android:layout_width="0dp"
+            android:layout_height="35dp"
+            android:layout_weight="1"
+            android:background="@drawable/btn_style_green1"
+            android:text="查看资料"
+            android:textColor="#19621c"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/call_add"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/btn_style_green1"
+            android:text="加为好友"
+            android:textColor="#19621c"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/call_reject"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="35dp"
+            android:layout_marginLeft="10dp"
+            android:background="@drawable/btn_style_green1"
+            android:text="拒绝聊天"
+            android:textColor="#19621c"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

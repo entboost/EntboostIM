@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mainPageBG"
+    android:fadingEdge="none" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/mainPageBG"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/user_name_layout"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bottom_top_line1" >
+
+            <ImageView
+                android:id="@+id/user_head"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="8dp"
+                android:padding="8dp"
+                android:src="@drawable/default_user" />
+
+            <TextView
+                android:id="@+id/user_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/user_head"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@id/user_head"
+                android:textColor="@color/text_color_2"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/user_account_lab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/user_username"
+                android:layout_below="@id/user_username"
+                android:layout_marginTop="5dp"
+                android:text="账号："
+                android:textColor="@color/text_color_gray"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/user_account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/user_username"
+                android:layout_marginTop="5dp"
+                android:layout_toRightOf="@id/user_account_lab"
+                android:textColor="@color/text_color_gray"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/user_username"
+                android:layout_below="@id/user_account_lab"
+                android:layout_marginTop="3dp"
+                android:text="编号："
+                android:textColor="@color/text_color_gray"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/user_id"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/textView2"
+                android:layout_alignBottom="@+id/textView2"
+                android:layout_toRightOf="@+id/textView2"
+                android:textColor="@color/text_color_gray"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/a4040" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/user_description_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_top_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_description_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="签名"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/des_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/des_arrow"
+                    android:layout_toRightOf="@id/user_description_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/user_url_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_top_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_url_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="主页"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/url_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_url"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/url_arrow"
+                    android:layout_toRightOf="@id/user_url_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_gender_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_gender_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="性别"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <com.entboost.im.ui.SegmentedRadioGroup
+                    android:id="@+id/segment_text"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:checkedButton="@+id/user_gender_male"
+                    android:gravity="right|center_vertical"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@id/user_gender_male"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:minHeight="28dip"
+                        android:minWidth="40dip"
+                        android:text="男"
+                        android:textColor="@drawable/segment_radio_text"
+                        android:textSize="12sp" />
+
+                    <RadioButton
+                        android:id="@+id/user_gender_female"
+                        android:button="@null"
+                        android:gravity="center"
+                        android:minHeight="28dip"
+                        android:minWidth="40dip"
+                        android:text="女"
+                        android:textColor="@drawable/segment_radio_text"
+                        android:textSize="12sp" />
+                </com.entboost.im.ui.SegmentedRadioGroup>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_birthday_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_birthday_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="生日"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/birthday_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_birthday"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/birthday_arrow"
+                    android:layout_toRightOf="@id/user_birthday_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="30dp"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/user_area_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_top_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_area_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="地区"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/area_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_area"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/area_arrow"
+                    android:layout_toRightOf="@id/user_area_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_zipcode_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_zipcode_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="邮编"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/zipcode_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_zipcode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/zipcode_arrow"
+                    android:layout_toRightOf="@id/user_zipcode_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_tel_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_tel_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="电话"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/tel_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_tel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/tel_arrow"
+                    android:layout_toRightOf="@id/user_tel_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_mobile_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_mobile_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="手机"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/mobile_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_mobile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/mobile_arrow"
+                    android:layout_toRightOf="@id/user_mobile_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/user_email_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_email_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="邮件"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/email_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/email_arrow"
+                    android:layout_toRightOf="@id/user_email_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/user_addr_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bottom_line1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:id="@+id/user_addr_lab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="8dp"
+                    android:text="地址"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <ImageView
+                    android:id="@+id/addr_arrow"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:src="@drawable/a4040" />
+
+                <TextView
+                    android:id="@+id/user_addr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/addr_arrow"
+                    android:layout_toRightOf="@id/user_addr_lab"
+                    android:gravity="right"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

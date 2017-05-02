@@ -1,0 +1,25 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WelcomeActivity" 
+    android:background="@drawable/welcome">
+
+    <ImageView
+        android:id="@+id/uilogo"
+        android:layout_width="218dp"
+        android:layout_height="222dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="112dp"
+        android:src="@drawable/uilogo" />
+
+<!--     <ImageView -->
+<!--         android:id="@+id/uiload" -->
+<!--         android:layout_width="wrap_content" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_centerHorizontal="true" -->
+<!--         android:src="@drawable/ui" -->
+<!--         android:layout_below="@+id/imageView1" /> -->
+
+</RelativeLayout>

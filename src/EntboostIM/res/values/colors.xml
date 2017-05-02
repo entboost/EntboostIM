@@ -1,0 +1,40 @@
+<resources>
+
+    <color name="primary">#00a2e8</color>
+    <color name="bg_p">#fafafa</color>
+    <color name="bg_s">#f0f0f0</color>
+    <color name="border_line">#e0e0e0</color>
+    <color name="text_link">#00a2e8</color>
+    <color name="text_color_1">#ffffff</color>
+    <color name="text_color_2">#000000</color>
+    <color name="text_color_gray">#808080</color>
+    <color name="text_color_hint">#e0e0e0</color>
+    
+    <color name="black_overlay">#66000000</color>
+    <color name="red">#FF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="blue">#33B5E5</color>
+    <color name="white">#ffffff</color>
+    <color name="black">#000000</color>
+    <color name="gray">#7c7c7c</color>
+    <color name="gray_white">#ebebeb</color>
+    <color name="gray_light">#887c7c7c</color>
+    <color name="gray_black">#2e2e2e</color>
+    <color name="yellow_white">#FFF8D7</color>
+    <color name="pink">#FF87EF</color>
+    <color name="orange">#ff6200</color>
+    <color name="transparent">#00000000</color>
+    <color name="window_bg">#88838B8B</color>
+    <color name="crop_background">#737373</color>
+    <color name="ivory">#FFFFF0</color>
+    <color name="mainPageBar">#7ec306</color>
+    <color name="itemBG">#ffffff</color>
+	<color name="list_divider">#e0e0e0</color>    
+    <color name="listdivider">#e0e0e0</color>
+    <color name="mainPageBG">#fafafa</color>
+    <color name="bottomTabViewText">#808080</color>
+    <color name="bottomTabViewTextSelect">#01ac0b</color>
+    <color name="login_blankbg">#fafafa</color>
+    <color name="login_bg">#00a2e8</color>
+
+</resources>

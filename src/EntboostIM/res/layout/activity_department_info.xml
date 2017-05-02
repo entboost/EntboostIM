@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mainPageBG"
+    android:fadingEdge="none" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/mainPageBG"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/department_name_layout"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bottom_top_line1" >
+
+            <ImageView
+                android:id="@+id/department_head"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="8dp"
+                android:padding="8dp"
+                android:src="@drawable/group_head_0" />
+
+            <TextView
+                android:id="@+id/department_username"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/department_head"
+                android:layout_marginTop="8dp"
+                android:layout_toRightOf="@id/department_head"
+                android:textColor="@color/text_color_2"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/department_username"
+                android:layout_below="@id/department_username"
+                android:layout_marginTop="3dp"
+                android:text="编号："
+                android:textColor="@color/text_color_gray"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/department_account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/textView2"
+                android:layout_alignBottom="@+id/textView2"
+                android:layout_toRightOf="@+id/textView2"
+                android:textColor="@color/text_color_gray"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/department_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textView2"
+                android:layout_toRightOf="@id/department_head"
+                android:textColor="@color/text_color_gray"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/department_name_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="8dp"
+                android:src="@drawable/a4040" 
+                android:visibility="gone"/>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/department_member_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bottom_top_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="人数"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/department_member"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+                
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/department_tel_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bottom_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="电话"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/department_tel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:layout_marginRight="8dp"
+                    android:singleLine="true" 
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/department_fax_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bottom_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="传真"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/department_fax"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_vertical"
+                    android:layout_marginRight="8dp"
+                    android:singleLine="true" 
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/department_email_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/bottom_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="邮箱"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/department_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_vertical"
+                    android:layout_marginRight="8dp"
+                    android:singleLine="true" 
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/department_com_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bottom_top_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="公司"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/department_com"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="8dp"
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/department_home_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bottom_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="主页"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/department_home"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_vertical"
+                    android:layout_marginRight="8dp"
+                    android:singleLine="true" 
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/department_addr_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bottom_line1"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="15dp"
+                    android:text="地址"
+                    android:textColor="@color/text_color_2"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/department_addr"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:gravity="center_vertical"
+                    android:layout_marginRight="8dp"
+                    android:singleLine="true" 
+                    android:textColor="@color/text_color_gray"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bottom_top_line1"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:gravity="center" >
+
+            <Button
+                android:id="@+id/department_send_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_style_green1"
+                android:padding="8dp"
+                android:text="发送消息"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/department_usermanager"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_style_green1"
+                android:padding="8dp"
+                android:text="添加员工"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                android:visibility="gone" />
+            
+            <Button
+                android:id="@+id/department_forbid_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_style_w"
+                android:padding="8dp"
+                android:text="禁言"
+                android:textColor="@drawable/btn_text_color_2"
+                android:textSize="14sp"
+                android:visibility="gone" />            
+
+            <Button
+                android:id="@+id/department_del_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/btn_style_w"
+                android:padding="8dp"
+                android:text="解散部门"
+                android:textColor="@drawable/btn_text_color_2"
+                android:textSize="14sp"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>
